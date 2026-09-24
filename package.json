@@ -1,0 +1,26 @@
+{
+  "name": "lee-audio",
+  "version": "1.0.0",
+  "description": "Roon Audio Visualization Engine",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lee0233/lee-audio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/lee0233/lee-audio/issues"
+  },
+  "homepage": "https://github.com/lee0233/lee-audio#readme",
+  "dependencies": {
+    "node-roon-api": "github:roonlabs/node-roon-api",
+    "node-roon-api-image": "github:roonlabs/node-roon-api-image",
+    "node-roon-api-transport": "github:roonlabs/node-roon-api-transport"
+  }
+}
