@@ -46,6 +46,12 @@ wss.on("connection", (socket) => {
 });
 
 // -------------------------------------------------------
+// Image Processing
+// -------------------------------------------------------
+
+let roonCore = null;
+
+// -------------------------------------------------------
 // Roon
 // -------------------------------------------------------
 
@@ -57,6 +63,8 @@ const roon = new RoonApi({
     email: "",
 
     core_paired: (core) => {
+        roonCore = core;
+
         console.log(`LEE AUDIO connected to ${core.display_name}`);
 
         const transport = core.services.RoonApiTransport;
@@ -85,9 +93,10 @@ const roon = new RoonApi({
         });
     },
 
-    core_unpaired: (core) => {
-        console.log(`Disconnected from ${core.display_name}`);
-    }
+core_unpaired: (core) => {
+    roonCore = null;
+    console.log(`Disconnected from ${core.display_name}`);
+}
 });
 
 function updateNowPlaying(zone) {
@@ -124,7 +133,10 @@ function updateNowPlaying(zone) {
             "",
 
         length:
-            nowPlaying.length || 0
+            nowPlaying.length || 0,
+
+        imageKey: 
+            nowPlaying.image_key || null
     };
 
     console.log(

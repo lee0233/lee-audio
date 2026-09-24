@@ -2,13 +2,12 @@
     box-sizing: border-box;
 }
 
-html,
-body {
+html, body {
     margin: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #020403;
+    background: #000;
     color: white;
     font-family: Arial, Helvetica, sans-serif;
 }
@@ -16,119 +15,199 @@ body {
 .panel {
     width: 100vw;
     height: 100vh;
-    padding: 55px 80px;
+    padding: 42px 70px;
+
     background:
-        radial-gradient(circle at 50% 40%, #122018 0%, #050807 45%, #000 100%);
+        radial-gradient(
+            ellipse at center,
+            #0b1713 0%,
+            #030706 45%,
+            #000 78%
+        );
 }
 
+/* ---------- Branding ---------- */
+
 header {
+    height: 145px;
     text-align: center;
-    height: 130px;
 }
 
 .brand {
     font-size: 52px;
-    letter-spacing: 14px;
     font-weight: 300;
+    letter-spacing: 17px;
 }
 
 .subtitle {
     margin-top: 12px;
-    font-size: 16px;
-    letter-spacing: 8px;
-    opacity: 0.6;
+    font-size: 15px;
+    letter-spacing: 9px;
+    opacity: .58;
 }
+
+/* ---------- Meter layout ---------- */
 
 .meters {
-    height: 720px;
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 100px;
+    gap: 70px;
 }
 
-.meter {
-    position: relative;
-    width: 1300px;
-    height: 570px;
+.meter-shell {
+    width: min(46vw, 1500px);
 
-    border: 3px solid #506b76;
-    border-radius: 20px;
+    padding: 13px;
+
+    border-radius: 24px;
 
     background:
         linear-gradient(
-            180deg,
-            #4ea4d8 0%,
-            #1d6c9e 45%,
-            #073554 100%
+            145deg,
+            #444,
+            #111 25%,
+            #050505 65%,
+            #333
         );
 
     box-shadow:
-        0 0 25px rgba(61, 168, 230, 0.55),
-        inset 0 0 80px rgba(255,255,255,0.12);
+        0 0 6px #000,
+        0 12px 35px rgba(0,0,0,.9),
+        0 0 32px rgba(41,163,225,.22);
 }
 
-.meter-scale {
-    position: absolute;
-    top: 65px;
-    left: 90px;
-    right: 90px;
-
-    display: flex;
-    justify-content: space-between;
-
-    font-size: 30px;
-    color: #eaf7ff;
+.meter {
+    width: 100%;
+    display: block;
+    overflow: visible;
 }
+
+.meter-face {
+    stroke: #55798c;
+    stroke-width: 4;
+}
+
+/* ---------- Scale ---------- */
+
+.scale-line {
+    stroke: rgba(245,252,255,.92);
+    stroke-width: 3;
+}
+
+.scale-line.minor {
+    stroke-width: 1.5;
+    opacity: .75;
+}
+
+.scale-number {
+    fill: #f4fbff;
+    font-size: 24px;
+    text-anchor: middle;
+    dominant-baseline: middle;
+}
+
+.vu-label {
+    fill: rgba(255,255,255,.72);
+    font-size: 22px;
+    letter-spacing: 8px;
+    text-anchor: middle;
+}
+
+.channel-label {
+    fill: white;
+    font-size: 25px;
+    font-weight: 500;
+    letter-spacing: 11px;
+    text-anchor: middle;
+}
+
+/* ---------- Needle ---------- */
 
 .needle {
-    position: absolute;
-
-    width: 6px;
-    height: 380px;
-
-    background: #111;
-
-    left: 50%;
-    bottom: -150px;
-
-    transform-origin: 50% 100%;
-    transform: rotate(-40deg);
-
-    transition: transform 100ms linear;
-
-    box-shadow: 0 0 4px rgba(0,0,0,0.8);
+    transform-origin: 500px 455px;
+    transform: rotate(-48deg);
+    transition: transform 85ms cubic-bezier(.2,.8,.2,1);
 }
 
-.channel {
-    position: absolute;
-    bottom: 45px;
-    width: 100%;
-
-    text-align: center;
-
-    font-size: 24px;
-    letter-spacing: 8px;
+.needle line {
+    stroke: #101010;
+    stroke-width: 5;
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,.5));
 }
+
+.needle circle {
+    fill: #090909;
+    stroke: #303030;
+    stroke-width: 4;
+}
+
+/* ---------- Metadata ---------- */
 
 .now-playing {
-    text-align: center;
-    margin-top: 15px;
+    width: 80%;
+    max-width: 1900px;
+    height: 230px;
+
+    margin: 32px auto 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 45px;
+}
+
+.artwork-frame {
+    width: 210px;
+    height: 210px;
+    flex: 0 0 210px;
+
+    background: #080808;
+    border: 1px solid #333;
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.8),
+        0 0 15px rgba(40,150,220,.10);
+}
+
+#artwork {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+}
+
+.track-info {
+    min-width: 0;
+    max-width: 1500px;
 }
 
 #track {
-    font-size: 48px;
+    font-size: 42px;
     font-weight: 500;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #artist {
     margin-top: 12px;
-    font-size: 30px;
-    opacity: 0.85;
+
+    font-size: 27px;
+    opacity: .88;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #album {
-    margin-top: 8px;
-    font-size: 21px;
-    opacity: 0.5;
+    margin-top: 9px;
+
+    font-size: 20px;
+    opacity: .52;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
