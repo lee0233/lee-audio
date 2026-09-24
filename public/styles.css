@@ -1,0 +1,134 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #020403;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.panel {
+    width: 100vw;
+    height: 100vh;
+    padding: 55px 80px;
+    background:
+        radial-gradient(circle at 50% 40%, #122018 0%, #050807 45%, #000 100%);
+}
+
+header {
+    text-align: center;
+    height: 130px;
+}
+
+.brand {
+    font-size: 52px;
+    letter-spacing: 14px;
+    font-weight: 300;
+}
+
+.subtitle {
+    margin-top: 12px;
+    font-size: 16px;
+    letter-spacing: 8px;
+    opacity: 0.6;
+}
+
+.meters {
+    height: 720px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 100px;
+}
+
+.meter {
+    position: relative;
+    width: 1300px;
+    height: 570px;
+
+    border: 3px solid #506b76;
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #4ea4d8 0%,
+            #1d6c9e 45%,
+            #073554 100%
+        );
+
+    box-shadow:
+        0 0 25px rgba(61, 168, 230, 0.55),
+        inset 0 0 80px rgba(255,255,255,0.12);
+}
+
+.meter-scale {
+    position: absolute;
+    top: 65px;
+    left: 90px;
+    right: 90px;
+
+    display: flex;
+    justify-content: space-between;
+
+    font-size: 30px;
+    color: #eaf7ff;
+}
+
+.needle {
+    position: absolute;
+
+    width: 6px;
+    height: 380px;
+
+    background: #111;
+
+    left: 50%;
+    bottom: -150px;
+
+    transform-origin: 50% 100%;
+    transform: rotate(-40deg);
+
+    transition: transform 100ms linear;
+
+    box-shadow: 0 0 4px rgba(0,0,0,0.8);
+}
+
+.channel {
+    position: absolute;
+    bottom: 45px;
+    width: 100%;
+
+    text-align: center;
+
+    font-size: 24px;
+    letter-spacing: 8px;
+}
+
+.now-playing {
+    text-align: center;
+    margin-top: 15px;
+}
+
+#track {
+    font-size: 48px;
+    font-weight: 500;
+}
+
+#artist {
+    margin-top: 12px;
+    font-size: 30px;
+    opacity: 0.85;
+}
+
+#album {
+    margin-top: 8px;
+    font-size: 21px;
+    opacity: 0.5;
+}

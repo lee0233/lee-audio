@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LEE AUDIO</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <main class="panel">
+
+        <header>
+            <div class="brand">LEE AUDIO</div>
+            <div class="subtitle">DIGITAL MUSIC SYSTEM</div>
+        </header>
+
+        <section class="meters">
+
+            <div class="meter">
+                <div class="meter-scale">
+                    <span>-40</span>
+                    <span>-20</span>
+                    <span>-10</span>
+                    <span>-5</span>
+                    <span>0</span>
+                </div>
+
+                <div class="needle" id="leftNeedle"></div>
+
+                <div class="channel">LEFT</div>
+            </div>
+
+            <div class="meter">
+                <div class="meter-scale">
+                    <span>-40</span>
+                    <span>-20</span>
+                    <span>-10</span>
+                    <span>-5</span>
+                    <span>0</span>
+                </div>
+
+                <div class="needle" id="rightNeedle"></div>
+
+                <div class="channel">RIGHT</div>
+            </div>
+
+        </section>
+
+        <section class="now-playing">
+            <div id="track">Waiting for Roon...</div>
+            <div id="artist"></div>
+            <div id="album"></div>
+        </section>
+
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
