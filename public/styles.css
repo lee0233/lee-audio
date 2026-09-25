@@ -2,199 +2,348 @@
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     margin: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden;
-    background: #000;
-    color: white;
+    background: #020303;
+    color: #fff;
     font-family: Arial, Helvetica, sans-serif;
 }
 
-.panel {
-    width: 100vw;
-    height: 100vh;
-    padding: 42px 70px;
+body {
+    overflow: hidden;
 
     background:
         radial-gradient(
-            ellipse at center,
-            #0b1713 0%,
-            #030706 45%,
+            ellipse at 50% 30%,
+            #10231e 0%,
+            #050908 38%,
             #000 78%
         );
 }
 
-/* ---------- Branding ---------- */
+.rack {
+    width: 100vw;
+    height: 100vh;
 
-header {
-    height: 145px;
-    text-align: center;
-}
+    padding: 28px 80px 34px;
 
-.brand {
-    font-size: 52px;
-    font-weight: 300;
-    letter-spacing: 17px;
-}
-
-.subtitle {
-    margin-top: 12px;
-    font-size: 15px;
-    letter-spacing: 9px;
-    opacity: .58;
-}
-
-/* ---------- Meter layout ---------- */
-
-.meters {
     display: flex;
-    justify-content: center;
-    gap: 70px;
+    flex-direction: column;
+    gap: 22px;
 }
 
-.meter-shell {
-    width: min(46vw, 1500px);
 
-    padding: 13px;
+/* =========================================================
+   SHARED COMPONENT CHASSIS
+   ========================================================= */
 
-    border-radius: 24px;
+.component {
+    position: relative;
+
+    width: 100%;
+
+    border: 1px solid #343839;
+    border-radius: 7px;
 
     background:
         linear-gradient(
-            145deg,
-            #444,
-            #111 25%,
-            #050505 65%,
-            #333
+            180deg,
+            #181b1c 0%,
+            #070909 12%,
+            #020303 75%,
+            #111414 100%
         );
 
     box-shadow:
-        0 0 6px #000,
-        0 12px 35px rgba(0,0,0,.9),
-        0 0 32px rgba(41,163,225,.22);
+        0 16px 38px rgba(0,0,0,.8),
+        inset 0 1px 0 rgba(255,255,255,.10),
+        inset 0 -1px 0 rgba(255,255,255,.06);
 }
 
-.meter {
-    width: 100%;
-    display: block;
-    overflow: visible;
-}
+.side-rail {
+    position: absolute;
 
-.meter-face {
-    stroke: #55798c;
-    stroke-width: 4;
-}
+    top: 18px;
+    bottom: 18px;
 
-/* ---------- Scale ---------- */
+    width: 20px;
 
-.scale-line {
-    stroke: rgba(245,252,255,.92);
-    stroke-width: 3;
-}
+    border-radius: 6px;
 
-.scale-line.minor {
-    stroke-width: 1.5;
-    opacity: .75;
-}
-
-.scale-number {
-    fill: #f4fbff;
-    font-size: 24px;
-    text-anchor: middle;
-    dominant-baseline: middle;
-}
-
-.vu-label {
-    fill: rgba(255,255,255,.72);
-    font-size: 22px;
-    letter-spacing: 8px;
-    text-anchor: middle;
-}
-
-.channel-label {
-    fill: white;
-    font-size: 25px;
-    font-weight: 500;
-    letter-spacing: 11px;
-    text-anchor: middle;
-}
-
-/* ---------- Needle ---------- */
-
-.needle {
-    transform-origin: 500px 455px;
-    transform: rotate(-48deg);
-    transition: transform 85ms cubic-bezier(.2,.8,.2,1);
-}
-
-.needle line {
-    stroke: #101010;
-    stroke-width: 5;
-    filter: drop-shadow(2px 2px 2px rgba(0,0,0,.5));
-}
-
-.needle circle {
-    fill: #090909;
-    stroke: #303030;
-    stroke-width: 4;
-}
-
-/* ---------- Metadata ---------- */
-
-.now-playing {
-    width: 80%;
-    max-width: 1900px;
-    height: 230px;
-
-    margin: 32px auto 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 45px;
-}
-
-.artwork-frame {
-    width: 210px;
-    height: 210px;
-    flex: 0 0 210px;
-
-    background: #080808;
-    border: 1px solid #333;
+    background:
+        linear-gradient(
+            90deg,
+            #111 0%,
+            #777 20%,
+            #d0d0d0 45%,
+            #555 70%,
+            #111 100%
+        );
 
     box-shadow:
-        0 8px 25px rgba(0,0,0,.8),
-        0 0 15px rgba(40,150,220,.10);
+        0 0 5px #000,
+        inset 0 0 3px rgba(255,255,255,.6);
+}
+
+.left-rail {
+    left: 14px;
+}
+
+.right-rail {
+    right: 14px;
+}
+
+
+/* =========================================================
+   DP-1
+   ========================================================= */
+
+.dp1 {
+    height: 305px;
+    flex: 0 0 305px;
+
+    padding: 30px 58px 27px;
+}
+
+.component-face {
+    height: 220px;
+
+    display: grid;
+
+    grid-template-columns:
+        280px
+        190px
+        minmax(600px, 1fr)
+        320px;
+
+    gap: 34px;
+
+    align-items: center;
+}
+
+
+/* ----- Branding ----- */
+
+.dp-brand-area {
+    height: 100%;
+
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    border-right: 1px solid rgba(255,255,255,.08);
+}
+
+.lee-logo {
+    color: #70d9ff;
+
+    font-size: 29px;
+    font-weight: 300;
+    letter-spacing: 7px;
+
+    text-shadow:
+        0 0 10px rgba(80,190,255,.45);
+}
+
+.model-name {
+    margin-top: 12px;
+
+    color: #e6e9e9;
+
+    font-size: 22px;
+    letter-spacing: 6px;
+}
+
+.model-description {
+    margin-top: 5px;
+
+    color: #717879;
+
+    font-size: 10px;
+    letter-spacing: 4px;
+}
+
+.power-control {
+    position: absolute;
+
+    left: 16px;
+    bottom: 2px;
+
+    text-align: center;
+}
+
+.power-led {
+    width: 6px;
+    height: 6px;
+
+    margin: 0 auto 5px;
+
+    border-radius: 50%;
+
+    background: #7cff93;
+
+    box-shadow:
+        0 0 7px #5cff79;
+}
+
+.power-button {
+    width: 30px;
+    height: 30px;
+
+    border-radius: 50%;
+
+    border: 1px solid #777;
+
+    background:
+        radial-gradient(
+            circle at 38% 32%,
+            #777,
+            #242424 35%,
+            #080808 75%
+        );
+
+    box-shadow:
+        inset 0 1px 2px rgba(255,255,255,.25),
+        0 2px 5px #000;
+}
+
+.tiny-label {
+    margin-top: 5px;
+
+    color: #777;
+
+    font-size: 8px;
+    letter-spacing: 2px;
+}
+
+
+/* ----- Artwork ----- */
+
+.artwork-frame {
+    width: 180px;
+    height: 180px;
+
+    padding: 4px;
+
+    border: 1px solid #4d5556;
+
+    background: #030404;
+
+    box-shadow:
+        0 5px 18px #000,
+        0 0 14px rgba(52,173,220,.13);
 }
 
 #artwork {
     width: 100%;
     height: 100%;
+
     object-fit: cover;
+
     display: none;
 }
 
-.track-info {
+
+/* ----- Main digital display ----- */
+
+.digital-display {
     min-width: 0;
-    max-width: 1500px;
+    height: 180px;
+
+    padding: 18px 26px;
+
+    border: 1px solid #174e55;
+    border-radius: 3px;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            180deg,
+            #00262b 0%,
+            #001b20 55%,
+            #001116 100%
+        );
+
+    box-shadow:
+        inset 0 0 28px rgba(0,220,255,.08),
+        0 0 14px rgba(0,190,225,.08);
+}
+
+.display-topline {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+
+    color: #67e9ff;
+
+    font-size: 10px;
+    letter-spacing: 3px;
+}
+
+.source-name {
+    color: #83f1ff;
+}
+
+.playing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    opacity: .7;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #65ffb0;
+
+    box-shadow:
+        0 0 6px #65ffb0;
+}
+
+.track-window {
+    margin-top: 15px;
+
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 #track {
-    font-size: 42px;
-    font-weight: 500;
+    color: #8eeeff;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 26px;
+    font-weight: 400;
+
+    letter-spacing: 1px;
 
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    text-shadow:
+        0 0 8px rgba(75,225,255,.35);
 }
 
 #artist {
-    margin-top: 12px;
+    margin-top: 7px;
 
-    font-size: 27px;
-    opacity: .88;
+    color: #d8fbff;
+
+    font-size: 16px;
 
     white-space: nowrap;
     overflow: hidden;
@@ -202,12 +351,344 @@ header {
 }
 
 #album {
-    margin-top: 9px;
+    margin-top: 4px;
 
-    font-size: 20px;
-    opacity: .52;
+    color: #75aeb4;
+
+    font-size: 12px;
 
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.progress-area {
+    margin-top: 13px;
+}
+
+.progress-track {
+    height: 2px;
+
+    background: #0d4b53;
+}
+
+.progress-fill {
+    width: 35%;
+    height: 100%;
+
+    background: #70ecff;
+
+    box-shadow:
+        0 0 5px #70ecff;
+}
+
+.time-row {
+    margin-top: 5px;
+
+    display: flex;
+    justify-content: space-between;
+
+    color: #4c929a;
+
+    font-family: monospace;
+    font-size: 10px;
+}
+
+
+/* ----- Transport area ----- */
+
+.transport-controls {
+    height: 180px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.format-display {
+    margin-bottom: 24px;
+
+    text-align: center;
+}
+
+.format-primary {
+    color: #69dcf0;
+
+    font-size: 15px;
+    letter-spacing: 5px;
+}
+
+.format-secondary {
+    margin-top: 5px;
+
+    color: #666;
+
+    font-size: 8px;
+    letter-spacing: 3px;
+}
+
+.transport-buttons {
+    display: flex;
+    gap: 19px;
+}
+
+.transport-buttons button {
+    width: 56px;
+    height: 42px;
+
+    border: 1px solid #505657;
+    border-radius: 3px;
+
+    color: #c8d2d3;
+
+    background:
+        linear-gradient(
+            #252929,
+            #090b0b
+        );
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.12),
+        0 3px 6px #000;
+
+    font-size: 14px;
+}
+
+.transport-buttons .play-button {
+    border-color: #247a86;
+
+    color: #7beaff;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.12),
+        0 0 10px rgba(50,200,230,.15),
+        0 3px 6px #000;
+}
+
+.transport-labels {
+    width: 205px;
+
+    margin-top: 7px;
+
+    display: flex;
+    justify-content: space-around;
+
+    color: #555;
+
+    font-size: 7px;
+    letter-spacing: 1px;
+}
+
+.component-bottom {
+    position: absolute;
+
+    bottom: 8px;
+    left: 0;
+    right: 0;
+
+    text-align: center;
+
+    color: #555c5d;
+
+    font-size: 8px;
+    letter-spacing: 5px;
+}
+
+
+/* =========================================================
+   PA-1
+   ========================================================= */
+
+.pa1 {
+    flex: 1;
+
+    min-height: 0;
+
+    padding:
+        42px
+        72px
+        34px;
+}
+
+.amp-heading {
+    height: 34px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 0 16px;
+
+    color: #666d6e;
+
+    font-size: 10px;
+    letter-spacing: 4px;
+}
+
+.amp-brand {
+    color: #6ddcff;
+
+    font-size: 17px;
+
+    text-shadow:
+        0 0 8px rgba(80,200,255,.3);
+}
+
+
+/* ----- Meters ----- */
+
+.meters {
+    height: calc(100% - 68px);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    gap: 60px;
+}
+
+.meter-shell {
+    width: min(46%, 1450px);
+
+    padding: 11px;
+
+    border-radius: 9px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #555,
+            #111 15%,
+            #030404 70%,
+            #333
+        );
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.9),
+        0 0 25px rgba(41,163,225,.16);
+}
+
+.meter {
+    width: 100%;
+
+    display: block;
+}
+
+.meter-face {
+    stroke: #55798c;
+    stroke-width: 4;
+}
+
+
+/* ----- Meter scale ----- */
+
+.scale-line {
+    stroke: rgba(245,252,255,.92);
+    stroke-width: 3;
+}
+
+.scale-number {
+    fill: #f4fbff;
+
+    font-size: 24px;
+
+    text-anchor: middle;
+    dominant-baseline: middle;
+}
+
+.vu-label {
+    fill: rgba(255,255,255,.72);
+
+    font-size: 22px;
+    letter-spacing: 8px;
+
+    text-anchor: middle;
+}
+
+.channel-label {
+    fill: white;
+
+    font-size: 25px;
+    font-weight: 500;
+    letter-spacing: 11px;
+
+    text-anchor: middle;
+}
+
+
+/* ----- Needle ----- */
+
+.needle {
+    transform-origin: 500px 455px;
+
+    transform: rotate(-48deg);
+
+    transition:
+        transform 85ms cubic-bezier(.2,.8,.2,1);
+}
+
+.needle line {
+    stroke: #101010;
+    stroke-width: 5;
+
+    filter:
+        drop-shadow(
+            2px 2px 2px rgba(0,0,0,.5)
+        );
+}
+
+.needle circle {
+    fill: #090909;
+
+    stroke: #303030;
+    stroke-width: 4;
+}
+
+
+/* ----- Amp footer ----- */
+
+.amp-footer {
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    color: #555d5e;
+
+    font-size: 8px;
+    letter-spacing: 4px;
+}
+
+
+/* =========================================================
+   SMALLER DISPLAY FALLBACK
+   ========================================================= */
+
+@media (max-width: 1800px) {
+
+    .rack {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+
+    .component-face {
+        grid-template-columns:
+            220px
+            160px
+            minmax(450px, 1fr)
+            250px;
+
+        gap: 22px;
+    }
+
+    .artwork-frame {
+        width: 150px;
+        height: 150px;
+    }
+
+    #track {
+        font-size: 21px;
+    }
 }

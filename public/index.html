@@ -8,99 +8,228 @@
 </head>
 
 <body>
-<main class="panel">
 
-    <header>
-        <div class="brand">LEE AUDIO</div>
-        <div class="subtitle">DIGITAL MUSIC SYSTEM</div>
-    </header>
+<main class="rack">
 
-    <section class="meters">
+    <!-- =====================================================
+         DP-1 DIGITAL PLAYER
+         ===================================================== -->
+    <section class="component dp1">
 
-        <div class="meter-shell">
-            <svg class="meter" viewBox="0 0 1000 500">
-                <defs>
-                    <linearGradient id="blueLeft" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="#54b9ee"/>
-                        <stop offset="45%" stop-color="#1478b2"/>
-                        <stop offset="100%" stop-color="#073755"/>
-                    </linearGradient>
+        <div class="side-rail left-rail"></div>
+        <div class="side-rail right-rail"></div>
 
-                    <radialGradient id="glowLeft">
-                        <stop offset="0%" stop-color="#69c8f5" stop-opacity=".35"/>
-                        <stop offset="100%" stop-color="#0076b5" stop-opacity="0"/>
-                    </radialGradient>
-                </defs>
+        <div class="component-face">
 
-                <rect class="meter-face" x="5" y="5" width="990" height="490" rx="18"
-                      fill="url(#blueLeft)"/>
+            <div class="dp-brand-area">
+                <div class="lee-logo">LEE AUDIO</div>
+                <div class="model-name">DP-1</div>
+                <div class="model-description">DIGITAL PLAYER</div>
 
-                <ellipse cx="500" cy="270" rx="440" ry="250"
-                         fill="url(#glowLeft)"/>
+                <div class="power-control">
+                    <div class="power-led"></div>
+                    <div class="power-button"></div>
+                    <div class="tiny-label">POWER</div>
+                </div>
+            </div>
 
-                <g id="leftScale"></g>
+            <div class="artwork-frame">
+                <img id="artwork" alt="Album artwork">
+            </div>
 
-                <text class="vu-label" x="500" y="335">WATTS</text>
-                <text class="channel-label" x="500" y="390">LEFT</text>
+            <div class="digital-display">
 
-                <g id="leftNeedle" class="needle">
-                    <line x1="500" y1="455" x2="500" y2="105"/>
-                    <circle cx="500" cy="455" r="18"/>
-                </g>
-            </svg>
+                <div class="display-topline">
+                    <span class="source-name">ROON</span>
+                    <span class="playing-indicator">
+                        <span class="status-dot"></span>
+                        PLAYING
+                    </span>
+                </div>
+
+                <div class="track-window">
+                    <div id="track">Waiting for Roon...</div>
+                </div>
+
+                <div id="artist"></div>
+                <div id="album"></div>
+
+                <div class="progress-area">
+                    <div class="progress-track">
+                        <div class="progress-fill"></div>
+                    </div>
+
+                    <div class="time-row">
+                        <span>0:00</span>
+                        <span>--:--</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="transport-controls">
+
+                <div class="format-display">
+                    <div class="format-primary">DIGITAL</div>
+                    <div class="format-secondary">HIGH RESOLUTION</div>
+                </div>
+
+                <div class="transport-buttons">
+                    <button>◀◀</button>
+                    <button class="play-button">▶</button>
+                    <button>▶▶</button>
+                </div>
+
+                <div class="transport-labels">
+                    <span>PREV</span>
+                    <span>PLAY</span>
+                    <span>NEXT</span>
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="meter-shell">
-            <svg class="meter" viewBox="0 0 1000 500">
-                <defs>
-                    <linearGradient id="blueRight" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="#54b9ee"/>
-                        <stop offset="45%" stop-color="#1478b2"/>
-                        <stop offset="100%" stop-color="#073755"/>
-                    </linearGradient>
-
-                    <radialGradient id="glowRight">
-                        <stop offset="0%" stop-color="#69c8f5" stop-opacity=".35"/>
-                        <stop offset="100%" stop-color="#0076b5" stop-opacity="0"/>
-                    </radialGradient>
-                </defs>
-
-                <rect class="meter-face" x="5" y="5" width="990" height="490" rx="18"
-                      fill="url(#blueRight)"/>
-
-                <ellipse cx="500" cy="270" rx="440" ry="250"
-                         fill="url(#glowRight)"/>
-
-                <g id="rightScale"></g>
-
-                <text class="vu-label" x="500" y="335">WATTS</text>
-                <text class="channel-label" x="500" y="390">RIGHT</text>
-
-                <g id="rightNeedle" class="needle">
-                    <line x1="500" y1="455" x2="500" y2="105"/>
-                    <circle cx="500" cy="455" r="18"/>
-                </g>
-            </svg>
+        <div class="component-bottom">
+            DP-1 HIGH RESOLUTION DIGITAL MUSIC PLAYER
         </div>
 
     </section>
 
-<section class="now-playing">
 
-    <div class="artwork-frame">
-        <img id="artwork" alt="Album artwork">
-    </div>
+    <!-- =====================================================
+         PA-1 — CURRENT WORKING METERS
+         ===================================================== -->
+    <section class="component pa1">
 
-    <div class="track-info">
-        <div id="track">Waiting for Roon...</div>
-        <div id="artist"></div>
-        <div id="album"></div>
-    </div>
+        <div class="side-rail left-rail"></div>
+        <div class="side-rail right-rail"></div>
 
-</section>
+        <div class="amp-heading">
+            <span class="amp-brand">LEE AUDIO</span>
+            <span>PA-1 REFERENCE POWER AMPLIFIER</span>
+        </div>
+
+        <section class="meters">
+
+            <div class="meter-shell">
+                <svg class="meter" viewBox="0 0 1000 500">
+
+                    <defs>
+                        <linearGradient id="blueLeft"
+                                        x1="0" y1="0"
+                                        x2="0" y2="1">
+                            <stop offset="0%" stop-color="#54b9ee"/>
+                            <stop offset="45%" stop-color="#1478b2"/>
+                            <stop offset="100%" stop-color="#073755"/>
+                        </linearGradient>
+
+                        <radialGradient id="glowLeft">
+                            <stop offset="0%"
+                                  stop-color="#69c8f5"
+                                  stop-opacity=".35"/>
+                            <stop offset="100%"
+                                  stop-color="#0076b5"
+                                  stop-opacity="0"/>
+                        </radialGradient>
+                    </defs>
+
+                    <rect class="meter-face"
+                          x="5" y="5"
+                          width="990" height="490"
+                          rx="18"
+                          fill="url(#blueLeft)"/>
+
+                    <ellipse cx="500" cy="270"
+                             rx="440" ry="250"
+                             fill="url(#glowLeft)"/>
+
+                    <g id="leftScale"></g>
+
+                    <text class="vu-label"
+                          x="500" y="335">WATTS</text>
+
+                    <text class="channel-label"
+                          x="500" y="390">LEFT</text>
+
+                    <g id="leftNeedle" class="needle">
+                        <line x1="500" y1="455"
+                              x2="500" y2="105"/>
+
+                        <circle cx="500"
+                                cy="455"
+                                r="18"/>
+                    </g>
+
+                </svg>
+            </div>
+
+
+            <div class="meter-shell">
+                <svg class="meter" viewBox="0 0 1000 500">
+
+                    <defs>
+                        <linearGradient id="blueRight"
+                                        x1="0" y1="0"
+                                        x2="0" y2="1">
+                            <stop offset="0%" stop-color="#54b9ee"/>
+                            <stop offset="45%" stop-color="#1478b2"/>
+                            <stop offset="100%" stop-color="#073755"/>
+                        </linearGradient>
+
+                        <radialGradient id="glowRight">
+                            <stop offset="0%"
+                                  stop-color="#69c8f5"
+                                  stop-opacity=".35"/>
+                            <stop offset="100%"
+                                  stop-color="#0076b5"
+                                  stop-opacity="0"/>
+                        </radialGradient>
+                    </defs>
+
+                    <rect class="meter-face"
+                          x="5" y="5"
+                          width="990" height="490"
+                          rx="18"
+                          fill="url(#blueRight)"/>
+
+                    <ellipse cx="500" cy="270"
+                             rx="440" ry="250"
+                             fill="url(#glowRight)"/>
+
+                    <g id="rightScale"></g>
+
+                    <text class="vu-label"
+                          x="500" y="335">WATTS</text>
+
+                    <text class="channel-label"
+                          x="500" y="390">RIGHT</text>
+
+                    <g id="rightNeedle" class="needle">
+                        <line x1="500" y1="455"
+                              x2="500" y2="105"/>
+
+                        <circle cx="500"
+                                cy="455"
+                                r="18"/>
+                    </g>
+
+                </svg>
+            </div>
+
+        </section>
+
+        <div class="amp-footer">
+            <span>DUAL MONO</span>
+            <span>DIRECT COUPLED</span>
+            <span>REFERENCE SERIES</span>
+        </div>
+
+    </section>
 
 </main>
 
 <script src="app.js"></script>
+
 </body>
 </html>
