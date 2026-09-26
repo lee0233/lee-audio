@@ -97,6 +97,45 @@
     </section>
 
 
+    <!-- CC-1: front-panel design; Roon control wiring comes next. -->
+    <section class="component cc1" aria-label="CC-1 control center">
+        <div class="side-rail left-rail" aria-hidden="true"></div>
+        <div class="side-rail right-rail" aria-hidden="true"></div>
+        <div class="cc-brand">
+            <div class="lee-logo">LEE AUDIO</div>
+            <div class="model-name">CC-1</div>
+            <div class="model-description">CONTROL CENTER</div><div class="power-control"><div class="power-led"></div><div class="power-button"></div><div class="tiny-label">POWER</div></div>
+        </div>
+        <div class="cc-source">
+            <div class="cc-label">SOURCE</div>
+            <div class="source-panel"><div class="source-active">● &nbsp; ROON</div>
+            <span>QOBUZ</span><span>LOCAL</span><span>AUX 1</span><span>AUX 2</span></div>
+        </div>
+        <div class="cc-signal" aria-label="Volume and signal data not connected">
+            <div class="cc-label">VOLUME</div>
+            <div class="volume-reading">— <span>dB</span></div>
+            <div class="volume-segments" aria-hidden="true"></div>
+            <div class="signal-details"><span>PCM — / —</span><span>STEREO</span></div>
+            <div class="cc-caption">CONTROL NOT CONNECTED</div>
+        </div>
+        <div class="cc-volume">
+            <div class="cc-label">VOLUME</div>
+            <button class="cc-knob" disabled aria-label="Volume control not yet connected"></button>
+        </div>
+        <div class="cc-options">
+            <div class="cc-label">BALANCE</div>
+            <button class="balance-knob" disabled aria-label="Balance control not yet connected"></button>
+            <div class="balance-labels"><span>L</span><span>R</span></div>
+            <div class="aux-controls">
+                <div><button disabled aria-label="Mute not yet connected"></button><span>MUTE</span></div>
+                <div><button disabled aria-label="Direct mode not yet connected"></button><span>DIRECT</span></div>
+                <div><button disabled aria-label="Display control not yet connected"></button><span>DISPLAY</span></div>
+            </div>
+        </div>
+        <div class="component-bottom">CC-1 REFERENCE CONTROL CENTER</div>
+    </section>
+
+
     <!-- =====================================================
          PA-1 — CURRENT WORKING METERS
          ===================================================== -->
@@ -106,8 +145,10 @@
         <div class="side-rail right-rail"></div>
 
         <div class="amp-heading">
-            <span class="amp-brand">LEE AUDIO</span>
-            <span>PA-1 REFERENCE POWER AMPLIFIER</span>
+            <div class="lee-logo">LEE AUDIO</div>
+            <div class="model-name">PA-1</div>
+            <div class="model-description">REFERENCE<br>POWER AMPLIFIER</div>
+            <div class="power-control"><div class="power-led"></div><div class="power-button"></div><div class="tiny-label">POWER</div></div>
         </div>
 
         <section class="meters">
@@ -119,9 +160,9 @@
                         <linearGradient id="blueLeft"
                                         x1="0" y1="0"
                                         x2="0" y2="1">
-                            <stop offset="0%" stop-color="#54b9ee"/>
-                            <stop offset="45%" stop-color="#1478b2"/>
-                            <stop offset="100%" stop-color="#073755"/>
+                            <stop offset="0%" stop-color="#27caff"/>
+                            <stop offset="45%" stop-color="#16b6ed"/>
+                            <stop offset="100%" stop-color="#087aaf"/>
                         </linearGradient>
 
                         <radialGradient id="glowLeft">
@@ -146,8 +187,10 @@
 
                     <g id="leftScale"></g>
 
-                    <text class="vu-label"
-                          x="500" y="335">WATTS</text>
+                    <text class="scale-unit" x="500" y="45">WATTS</text>
+                    <text class="scale-unit" x="500" y="245">DECIBELS</text>
+                    <text class="vu-label" x="500" y="325">POWER OUTPUT</text>
+                    <text class="meter-reference" x="500" y="355">0 dB = 150 W · SIMULATED</text>
 
                     <text class="channel-label"
                           x="500" y="390">LEFT</text>
@@ -172,9 +215,9 @@
                         <linearGradient id="blueRight"
                                         x1="0" y1="0"
                                         x2="0" y2="1">
-                            <stop offset="0%" stop-color="#54b9ee"/>
-                            <stop offset="45%" stop-color="#1478b2"/>
-                            <stop offset="100%" stop-color="#073755"/>
+                            <stop offset="0%" stop-color="#27caff"/>
+                            <stop offset="45%" stop-color="#16b6ed"/>
+                            <stop offset="100%" stop-color="#087aaf"/>
                         </linearGradient>
 
                         <radialGradient id="glowRight">
@@ -199,8 +242,10 @@
 
                     <g id="rightScale"></g>
 
-                    <text class="vu-label"
-                          x="500" y="335">WATTS</text>
+                    <text class="scale-unit" x="500" y="45">WATTS</text>
+                    <text class="scale-unit" x="500" y="245">DECIBELS</text>
+                    <text class="vu-label" x="500" y="325">POWER OUTPUT</text>
+                    <text class="meter-reference" x="500" y="355">0 dB = 150 W · SIMULATED</text>
 
                     <text class="channel-label"
                           x="500" y="390">RIGHT</text>
@@ -220,11 +265,42 @@
         </section>
 
         <div class="amp-footer">
-            <span>DUAL MONO</span>
-            <span>DIRECT COUPLED</span>
-            <span>REFERENCE SERIES</span>
+            <span>DUAL MONO POWER AMPLIFIER</span>
         </div>
 
+    </section>
+
+    <!-- PC-1 is a visual front panel until a power-monitor data source is connected. -->
+    <section class="component pc1" aria-label="PC-1 power center — monitoring not connected">
+        <div class="side-rail left-rail" aria-hidden="true"></div>
+        <div class="side-rail right-rail" aria-hidden="true"></div>
+        <div class="pc-brand">
+            <div class="lee-logo">LEE AUDIO</div>
+            <div class="model-name">PC-1</div>
+            <div class="model-description">POWER CENTER</div>
+        </div>
+        <div class="pc-display">
+            <div class="pc-label">LINE VOLTAGE</div>
+            <div class="pc-reading">— — — <span>V</span></div>
+            <div class="pc-note">MONITOR NOT CONNECTED</div>
+        </div>
+        <div class="pc-banks" aria-label="Outlet bank status unavailable">
+            <div class="pc-label">OUTLET BANKS</div>
+            <div class="pc-bank-row">
+                <div><span class="pc-indicator" aria-hidden="true"></span>DIGITAL</div>
+                <div><span class="pc-indicator" aria-hidden="true"></span>CONTROL</div>
+                <div><span class="pc-indicator" aria-hidden="true"></span>POWER AMP</div>
+            </div>
+        </div>
+        <div class="pc-status" aria-label="Protection and ground status unavailable">
+            <div><span class="pc-indicator" aria-hidden="true"></span>PROTECTION</div>
+            <div><span class="pc-indicator" aria-hidden="true"></span>GROUND</div>
+            <div class="pc-note">STATUS UNAVAILABLE</div>
+        </div>
+        <div class="pc-standby">
+            <button class="power-button" disabled aria-label="PC-1 standby control not connected"></button>
+            <div class="tiny-label">STANDBY</div>
+        </div>
     </section>
 
 </main>

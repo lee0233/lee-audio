@@ -8,27 +8,23 @@ const rightNeedle = document.getElementById("rightNeedle");
 
 const NS = "http://www.w3.org/2000/svg";
 
-/*
- * Meter geometry
- *
- * Pivot: 500,455
- * Scale radius: ~330px
- * Sweep: -55° to +55°
+/* Decorative power scale: 0 dB = 150 W; P = 150 * 10 ** (dB / 10).
+ * Watt labels are rounded. Needle movement remains a simulation.
+ * Keep the original pivot; space the main 10 dB steps evenly.
  */
-
 const markings = [
-    { value: "-50", angle: -55 },
-    { value: "-40", angle: -46 },
-    { value: "-30", angle: -37 },
-    { value: "-20", angle: -27 },
-    { value: "-10", angle: -16 },
-    { value: "-5",  angle:  -7 },
-    { value: "-3",  angle:   2 },
-    { value: "-1",  angle:  12 },
-    { value: "0",   angle:  23 },
-    { value: "+1",  angle:  34 },
-    { value: "+2",  angle:  44 },
-    { value: "+3",  angle:  54 }
+    { db: -50, angle: -55, watts: "0.0015" },
+    { db: -40, angle: -37, watts: "0.015" },
+    { db: -30, angle: -19, watts: "0.15" },
+    { db: -20, angle: -1, watts: "1.5" },
+    { db: -10, angle: 17, watts: "15" },
+    { db: -5, angle: 26 },
+    { db: -3, angle: 29.6 },
+    { db: -1, angle: 33.2 },
+    { db: 0, angle: 35, watts: "150" },
+    { db: 1, angle: 41.33 },
+    { db: 2, angle: 47.67 },
+    { db: 3, angle: 54, watts: "300" }
 ];
 
 function point(angle, radius) {
@@ -44,31 +40,38 @@ function drawScale(groupId) {
 
     const group = document.getElementById(groupId);
 
+    const start = point(-55, 330);
+    const end = point(54, 330);
+    const arc = document.createElementNS(NS, "path");
+    arc.setAttribute("d", `M ${start.x} ${start.y} A 330 330 0 0 1 ${end.x} ${end.y}`);
+    arc.setAttribute("class", "scale-arc");
+    group.appendChild(arc);
+
     markings.forEach(mark => {
-
-        const inner = point(mark.angle, 315);
+        const major = mark.watts !== undefined;
+        const inner = point(mark.angle, major ? 307 : 318);
         const outer = point(mark.angle, 345);
-        const label = point(mark.angle, 375);
-
         const tick = document.createElementNS(NS, "line");
-
         tick.setAttribute("x1", inner.x);
         tick.setAttribute("y1", inner.y);
         tick.setAttribute("x2", outer.x);
         tick.setAttribute("y2", outer.y);
         tick.setAttribute("class", "scale-line");
-
         group.appendChild(tick);
 
-        const number = document.createElementNS(NS, "text");
-
-        number.setAttribute("x", label.x);
-        number.setAttribute("y", label.y);
-        number.setAttribute("class", "scale-number");
-
-        number.textContent = mark.value;
-
-        group.appendChild(number);
+        if (!major) return;
+        for (const [label, radius, unit] of [
+            [mark.watts, 379, "watts"],
+            [mark.db > 0 ? `+${mark.db}` : String(mark.db), 279, "db"]
+        ]) {
+            const position = point(mark.angle, radius);
+            const number = document.createElementNS(NS, "text");
+            number.setAttribute("x", position.x);
+            number.setAttribute("y", position.y);
+            number.setAttribute("class", `scale-number scale-${unit}`);
+            number.textContent = label;
+            group.appendChild(number);
+        }
     });
 }
 
