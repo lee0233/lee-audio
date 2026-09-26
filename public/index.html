@@ -45,20 +45,24 @@
                         <span class="status-dot"></span>
                         PLAYING
                     </span>
-                    <span class="format-readout">FLAC 24/192</span>
+                    <span id="format-readout" class="format-readout">FORMAT</span>
                     <span class="track-time"><span id="elapsed">0:00</span> / <span id="duration">--:--</span></span>
                 </div>
 
-                <div class="track-window">
-                    <div id="track">Waiting for Roon...</div>
+                <div class="marquee-window track-window">
+                    <div id="track" class="marquee-text">Waiting for Roon...</div>
                 </div>
 
-                <div id="artist"></div>
-                <div id="album"></div>
+                <div class="marquee-window artist-window">
+                    <div id="artist" class="marquee-text"></div>
+                </div>
+                <div class="marquee-window album-window">
+                    <div id="album" class="marquee-text"></div>
+                </div>
 
                 <div class="progress-area">
                     <div class="progress-track">
-                        <div class="progress-fill"></div>
+                        <div id="progress-fill" class="progress-fill"></div>
                     </div>
 
                     <div class="time-row">
@@ -73,13 +77,13 @@
 
                 <div class="format-display">
                     <div class="format-primary">DIGITAL</div>
-                    <div class="format-secondary">HIGH RESOLUTION</div>
+                    <div class="format-secondary">HIGH RESOLUTION AUDIO PLAYER</div>
                 </div>
 
                 <div class="transport-buttons">
-                    <button>◀◀</button>
-                    <button class="play-button">▶</button>
-                    <button>▶▶</button>
+                    <button id="previous-button" aria-label="Previous track">◀◀</button>
+                    <button id="play-button" class="play-button" aria-label="Play or pause">▶</button>
+                    <button id="next-button" aria-label="Next track">▶▶</button>
                 </div>
 
                 <div class="transport-labels">

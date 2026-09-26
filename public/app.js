@@ -7,11 +7,44 @@ const duration = document.getElementById("duration");
 const elapsedBottom = document.getElementById("elapsed-bottom");
 const durationBottom = document.getElementById("duration-bottom");
 const pcAmps = document.getElementById("pc-amps");
+const progressFill = document.getElementById("progress-fill");
+const progressTrack = document.querySelector(".progress-track");
+const formatReadout = document.getElementById("format-readout");
 
 const leftNeedle = document.getElementById("leftNeedle");
 const rightNeedle = document.getElementById("rightNeedle");
+const previousButton = document.getElementById("previous-button");
+const playButton = document.getElementById("play-button");
+const nextButton = document.getElementById("next-button");
 
 const NS = "http://www.w3.org/2000/svg";
+
+function setMarquee(element, value) {
+    const text = value || "";
+    if (element.textContent === text && element.dataset.marqueeMeasured === "true") return;
+
+    element.textContent = text;
+    element.classList.remove("is-scrolling");
+    element.dataset.marqueeMeasured = "false";
+
+    requestAnimationFrame(() => {
+        const windowElement = element.parentElement;
+        const distance = windowElement.clientWidth - element.scrollWidth;
+        if (distance < -2) {
+            element.style.setProperty("--scroll-distance", `${distance}px`);
+            element.style.setProperty("--scroll-duration", `${Math.max(8, Math.min(24, 4 + Math.abs(distance) * 0.035))}s`);
+            element.classList.add("is-scrolling");
+        }
+        element.dataset.marqueeMeasured = "true";
+    });
+}
+
+window.addEventListener("resize", () => {
+    [track, artist, album].forEach(element => {
+        element.dataset.marqueeMeasured = "false";
+        setMarquee(element, element.textContent);
+    });
+});
 
 /* Decorative power scale: 0 dB = 150 W; P = 150 * 10 ** (dB / 10).
  * Watt labels are rounded. Needle movement remains a simulation.
@@ -100,9 +133,14 @@ socket.addEventListener("message", event => {
 
     if (data.type !== "now-playing") return;
 
-    track.textContent = data.track;
-    artist.textContent = data.artist;
-    album.textContent = data.album;
+    setMarquee(track, data.track);
+    setMarquee(artist, data.artist);
+    setMarquee(album, data.album);
+    const isPlaying = data.state === "playing";
+    playButton.textContent = isPlaying ? "" : "▶";
+    playButton.classList.toggle("pause-state", isPlaying);
+    playButton.setAttribute("aria-label", data.state === "playing" ? "Pause" : "Play");
+    formatReadout.textContent = data.format || "FORMAT";
 
     const formatTime = seconds => {
         if (!Number.isFinite(seconds) || seconds <= 0) return "--:--";
@@ -114,8 +152,13 @@ socket.addEventListener("message", event => {
     const durationText = formatTime(data.length);
     elapsed.textContent = elapsedText === "--:--" ? "0:00" : elapsedText;
     duration.textContent = durationText;
+    duration.dataset.seconds = data.length > 0 ? String(data.length) : "";
     elapsedBottom.textContent = elapsed.textContent;
     durationBottom.textContent = durationText;
+    const progress = data.length > 0
+        ? Math.max(0, Math.min(100, (data.seekPosition / data.length) * 100))
+        : 0;
+    progressFill.style.width = `${progress}%`;
 
 if (data.imageKey) {
     artwork.src =
@@ -132,10 +175,26 @@ if (data.imageKey) {
         : "LEE AUDIO";
 });
 
+function sendControl(control) {
+    if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ control }));
+}
+
+progressTrack.addEventListener("click", event => {
+    const durationSeconds = Number(duration.dataset.seconds || 0);
+    if (!durationSeconds || socket.readyState !== WebSocket.OPEN) return;
+    const bounds = progressTrack.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (event.clientX - bounds.left) / bounds.width));
+    socket.send(JSON.stringify({ control: "seek", seconds: ratio * durationSeconds }));
+});
+
+previousButton.addEventListener("click", () => sendControl("previous"));
+playButton.addEventListener("click", () => sendControl("playpause"));
+nextButton.addEventListener("click", () => sendControl("next"));
+
 socket.addEventListener("close", () => {
-    track.textContent = "Connection lost";
-    artist.textContent = "";
-    album.textContent = "";
+    setMarquee(track, "Connection lost");
+    setMarquee(artist, "");
+    setMarquee(album, "");
 });
 
 

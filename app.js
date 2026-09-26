@@ -3,6 +3,8 @@ const RoonApiTransport = require("node-roon-api-transport");
 
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
+const { execFile, execFileSync } = require("child_process");
 const { WebSocketServer } = require("ws");
 
 const TARGET_ZONE = "Topping DX5";
@@ -26,6 +28,58 @@ const server = web.listen(8080, () => {
 const wss = new WebSocketServer({ server });
 
 let currentTrack = null;
+let currentZone = null;
+let roonTransport = null;
+let coreAudioProbe = null;
+
+function startCoreAudioProbe() {
+    if (process.platform !== "darwin") return;
+
+    const source = path.join(__dirname, "scripts", "coreaudio-format.swift");
+    const binary = path.join("/tmp", "lee-audio-coreaudio-format");
+
+    try {
+        if (!fs.existsSync(binary) || fs.statSync(source).mtimeMs > fs.statSync(binary).mtimeMs) {
+            const cache = "/tmp/lee-audio-swift-cache";
+            fs.mkdirSync(cache, { recursive: true });
+            execFileSync("swiftc", [source, "-O", "-o", binary], {
+                stdio: "ignore",
+                env: { ...process.env, CLANG_MODULE_CACHE_PATH: cache }
+            });
+        }
+        coreAudioProbe = binary;
+        console.log("Watching Mimas CoreAudio output...");
+    } catch (error) {
+        console.log("CoreAudio format probe unavailable; using Roon metadata fallback.");
+        return;
+    }
+
+    const poll = () => {
+        execFile(coreAudioProbe, [], (error, stdout) => {
+            if (!error && currentTrack) {
+                try {
+                    const data = JSON.parse(stdout.trim());
+                    if (data.sampleRate && data.channels) {
+                        const rate = Number(data.sampleRate);
+                        const rateText = rate >= 1000
+                            ? `${Number((rate / 1000).toFixed(1))} kHz`
+                            : `${rate} Hz`;
+                        const bitsText = data.bits ? `${data.bits}-bit` : "";
+                        const channelText = `${data.channels} ch`;
+                        const format = [rateText, bitsText, channelText].filter(Boolean).join(" · ");
+                        if (currentTrack.format !== format) {
+                            currentTrack.format = format;
+                            broadcast(currentTrack);
+                        }
+                    }
+                } catch { /* keep the last known format */ }
+            }
+            setTimeout(poll, 2000);
+        });
+    };
+
+    poll();
+}
 
 function broadcast(data) {
     const message = JSON.stringify(data);
@@ -43,6 +97,27 @@ wss.on("connection", (socket) => {
     if (currentTrack) {
         socket.send(JSON.stringify(currentTrack));
     }
+
+    socket.on("message", raw => {
+        if (!roonTransport || !currentZone) return;
+        let request;
+        try { request = JSON.parse(raw.toString()); } catch { return; }
+        if (request.control === "seek") {
+            const seconds = Number(request.seconds);
+            if (currentTrack?.length > 0 && Number.isFinite(seconds)) {
+                roonTransport.seek(currentZone, "absolute", Math.max(0, Math.min(currentTrack.length, seconds)), error => {
+                    if (error) console.error(`Seek failed: ${error}`);
+                });
+            }
+            return;
+        }
+
+        const controls = new Set(["previous", "playpause", "next"]);
+        if (!controls.has(request.control)) return;
+        roonTransport.control(currentZone, request.control, error => {
+            if (error) console.error(`Transport control failed: ${error}`);
+        });
+    });
 });
 
 // -------------------------------------------------------
@@ -68,6 +143,7 @@ const roon = new RoonApi({
         console.log(`LEE AUDIO connected to ${core.display_name}`);
 
         const transport = core.services.RoonApiTransport;
+        roonTransport = transport;
 
         transport.subscribe_zones((cmd, data) => {
 
@@ -90,6 +166,15 @@ const roon = new RoonApi({
                     }
                 }
             }
+
+            if (cmd === "Changed" && data.zones_seek_changed) {
+                for (const change of data.zones_seek_changed) {
+                    if (currentZone && change.zone_id === currentZone.zone_id && currentTrack) {
+                        currentTrack.seekPosition = change.seek_position || 0;
+                        broadcast(currentTrack);
+                    }
+                }
+            }
         });
     },
 
@@ -100,6 +185,8 @@ core_unpaired: (core) => {
 });
 
 function updateNowPlaying(zone) {
+
+    currentZone = zone;
 
     const nowPlaying = zone.now_playing;
 
@@ -132,6 +219,10 @@ function updateNowPlaying(zone) {
             nowPlaying.three_line?.line3 ||
             "",
 
+        format:
+            (nowPlaying.three_line?.line1 || "").match(/\(([^)]+(?:kHz|Hz)[^)]*)\)/i)?.[1] ||
+            "FORMAT",
+
         length:
             nowPlaying.length || 0,
 
@@ -156,5 +247,7 @@ roon.init_services({
 });
 
 roon.start_discovery();
+
+startCoreAudioProbe();
 
 console.log("LEE AUDIO starting...");

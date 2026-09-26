@@ -28,13 +28,21 @@ body { background: radial-gradient(ellipse at 50% 25%, #24231e, #080a09 65%, #03
 .track-time { margin-left:auto; color:#1ad0ff; white-space:nowrap; }
 .playing-indicator { display:flex; gap:.6cqw; align-items:center; font-size:.7cqw; }
 .status-dot { width:.6cqw; height:.6cqw; border-radius:50%; background:#23ef72; box-shadow:0 0 10px #23ef7240; }
+.marquee-window { width:100%; overflow:hidden; }
 .track-window { margin-top:1.2cqw; }
-#track { font-size:2.05cqw; color:#13bfff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:0 0 12px #13bfff30; }
-#artist { margin-top:.6cqw; font-size:1.4cqw; color:#24cfff; }
-#album { margin-top:.4cqw; font-size:1.1cqw; color:#24cfff; }
-#artist,#album { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.artist-window { margin-top:.6cqw; }
+.album-window { margin-top:.4cqw; }
+.marquee-text { width:max-content; max-width:none; white-space:nowrap; text-overflow:clip; }
+#track { font-size:2.05cqw; color:#13bfff; text-shadow:0 0 12px #13bfff30; }
+#artist { font-size:1.4cqw; color:#24cfff; }
+#album { font-size:1.1cqw; color:#24cfff; }
+.marquee-text.is-scrolling { animation: dp-text-scroll var(--scroll-duration, 12s) ease-in-out infinite alternate; }
+@keyframes dp-text-scroll {
+    0%, 16% { transform:translateX(0); }
+    84%, 100% { transform:translateX(var(--scroll-distance)); }
+}
 .progress-area { margin-top:1.2cqw; }
-.progress-track { height:.5cqw; background:#00212d; border-radius:20px; overflow:hidden; }
+.progress-track { height:.5cqw; background:#00212d; border-radius:20px; overflow:hidden; cursor:pointer; }
 .progress-fill { height:100%; width:35%; background:#15bbed; border-radius:20px; }
 .time-row { display:flex; justify-content:space-between; margin-top:.4cqw; font-size:.7cqw; color:#68b6d2; }
 .transport-controls { text-align:center; }
@@ -44,6 +52,7 @@ body { background: radial-gradient(ellipse at 50% 25%, #24231e, #080a09 65%, #03
 .transport-buttons { display:flex; align-items:center; justify-content:center; gap:1cqw; }
 .transport-buttons button { width:3.3cqw; height:3.3cqw; border-radius:50%; border:2px solid #aab5b8; color:#e4f3fa; font-size:1.1cqw; background:radial-gradient(circle at 32% 22%,#d6dfe1 0%,#69757a 15%,#222b30 45%,#050708 72%); box-shadow:0 0 0 .14cqw #273238,0 3px 7px #000,inset 0 1px 2px #fff8; }
 .transport-buttons .play-button { width:4.4cqw; height:4.4cqw; border-color:#03baff; box-shadow:0 0 0 3px #102b3a,0 0 12px #00baff50; }
+.transport-buttons .play-button.pause-state::before,.transport-buttons .play-button.pause-state::after { content:""; display:inline-block; width:.42cqw; height:1.35cqw; margin:0 .14cqw; border-radius:.08cqw; background:#e4f3fa; box-shadow:0 0 6px #52d8ff; vertical-align:middle; }
 .transport-labels { display:flex; justify-content:space-around; margin-top:1cqw; font-size:.55cqw; letter-spacing:.1cqw; color:#7a959e; }
 .component-bottom { display:none; }
 .cc1 { display:grid; grid-template-columns:14% 15% 27% 18% 16%; gap:2cqw; align-items:center; padding-block:1.7cqw; }
