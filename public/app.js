@@ -10,6 +10,64 @@ const pcAmps = document.getElementById("pc-amps");
 const progressFill = document.getElementById("progress-fill");
 const progressTrack = document.querySelector(".progress-track");
 const formatReadout = document.getElementById("format-readout");
+const ccFormatReadout = document.getElementById("cc-format-readout");
+const ccChannelReadout = document.getElementById("cc-channel-readout");
+const ccVolumeValue = document.getElementById("cc-volume-value");
+const ccVolumeUnit = document.getElementById("cc-volume-unit");
+const ccVolumeSegments = document.getElementById("cc-volume-segments");
+const ccVolumeKnob = document.getElementById("cc-volume-knob");
+const ccMuteButton = document.getElementById("cc-mute-button");
+const ccDisplayButton = document.getElementById("cc-display-button");
+const ccSignal = document.querySelector(".cc-signal");
+const ccSignalLabel = ccSignal.querySelector(".cc-label");
+const ccSpectrum = document.getElementById("cc-spectrum");
+const ccSpectrumBars = document.getElementById("cc-spectrum-bars");
+const ccSpectrumBarValues = Array.from({ length: 24 }, (_, index) => 0.2 + (index % 5) * 0.04);
+const ccSpectrumPeakValues = Array.from({ length: 24 }, () => 0.2);
+const ccSpectrumPeakTimes = Array.from({ length: 24 }, () => 0);
+
+ccSpectrumBarValues.forEach(() => {
+    const bar = document.createElement("div");
+    bar.className = "spectrum-bar";
+    ccSpectrumBars.appendChild(bar);
+});
+const ccSpectrumBarElements = [...ccSpectrumBars.children];
+let spectrumActive = false;
+let currentVolume = { type: "number", min: 0, max: 100, value: 0, isMuted: false };
+let queuedVolume = null;
+let volumeSendTimer = null;
+
+function formatForDisplay(value) {
+    const text = value || "FORMAT";
+    const match = text.match(/\s*[·•]\s*(\d+)\s*ch\s*$/i);
+    if (!match) return { format: text, channels: "" };
+    const channels = Number(match[1]) === 2 ? "STEREO" : Number(match[1]) === 1 ? "MONO" : `${match[1]} CH`;
+    return { format: text.slice(0, match.index), channels };
+}
+
+function renderVolume(volume) {
+    currentVolume = {
+        type: volume.type || "number",
+        min: Number.isFinite(Number(volume.min)) ? Number(volume.min) : 0,
+        max: Number.isFinite(Number(volume.max)) ? Number(volume.max) : 100,
+        value: Number(volume.value),
+        isMuted: Boolean(volume.isMuted)
+    };
+    const unit = currentVolume.type === "db" ? "dB" : "%";
+    const ratio = currentVolume.max > currentVolume.min
+        ? Math.max(0, Math.min(1, (currentVolume.value - currentVolume.min) / (currentVolume.max - currentVolume.min)))
+        : 0;
+    ccVolumeValue.textContent = Number.isFinite(currentVolume.value)
+        ? currentVolume.value.toFixed(unit === "dB" ? 1 : 0)
+        : "—";
+    ccVolumeUnit.textContent = unit;
+    ccVolumeSegments.style.setProperty("--volume-level", `${ratio * 100}%`);
+    ccVolumeKnob.style.setProperty("--knob-angle", `${-135 + ratio * 270}deg`);
+    ccVolumeKnob.dataset.min = currentVolume.min;
+    ccVolumeKnob.dataset.max = currentVolume.max;
+    ccMuteButton.classList.toggle("active", currentVolume.isMuted);
+    ccMuteButton.setAttribute("aria-label", currentVolume.isMuted ? "Unmute" : "Mute");
+}
 
 const leftNeedle = document.getElementById("leftNeedle");
 const rightNeedle = document.getElementById("rightNeedle");
@@ -140,7 +198,14 @@ socket.addEventListener("message", event => {
     playButton.textContent = isPlaying ? "" : "▶";
     playButton.classList.toggle("pause-state", isPlaying);
     playButton.setAttribute("aria-label", data.state === "playing" ? "Pause" : "Play");
-    formatReadout.textContent = data.format || "FORMAT";
+    const displayFormat = formatForDisplay(data.format);
+    formatReadout.textContent = displayFormat.channels
+        ? `${displayFormat.format} · ${displayFormat.channels}`
+        : displayFormat.format;
+    if (ccFormatReadout) ccFormatReadout.textContent = displayFormat.format;
+    if (ccChannelReadout) ccChannelReadout.textContent = displayFormat.channels || "STEREO";
+
+    if (data.volume) renderVolume(data.volume);
 
     const formatTime = seconds => {
         if (!Number.isFinite(seconds) || seconds <= 0) return "--:--";
@@ -178,6 +243,52 @@ if (data.imageKey) {
 function sendControl(control) {
     if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ control }));
 }
+
+function sendVolumeFromPointer(event) {
+    const bounds = ccVolumeKnob.getBoundingClientRect();
+    const x = event.clientX - (bounds.left + bounds.width / 2);
+    const y = event.clientY - (bounds.top + bounds.height / 2);
+    let angle = Math.atan2(x, -y) * 180 / Math.PI;
+    angle = Math.max(-135, Math.min(135, angle));
+    const ratio = (angle + 135) / 270;
+    const value = currentVolume.min + ratio * (currentVolume.max - currentVolume.min);
+    currentVolume.value = value;
+    renderVolume(currentVolume);
+    queuedVolume = value;
+    if (!volumeSendTimer) {
+        volumeSendTimer = setTimeout(() => {
+            if (socket.readyState === WebSocket.OPEN && queuedVolume !== null) {
+                socket.send(JSON.stringify({ control: "volume", value: queuedVolume }));
+            }
+            queuedVolume = null;
+            volumeSendTimer = null;
+        }, 32);
+    }
+}
+
+ccVolumeKnob.addEventListener("pointerdown", event => {
+    if (socket.readyState !== WebSocket.OPEN) return;
+    ccVolumeKnob.setPointerCapture(event.pointerId);
+    sendVolumeFromPointer(event);
+});
+ccVolumeKnob.addEventListener("pointermove", event => {
+    if (ccVolumeKnob.hasPointerCapture(event.pointerId)) sendVolumeFromPointer(event);
+});
+ccVolumeKnob.addEventListener("pointerup", event => ccVolumeKnob.releasePointerCapture(event.pointerId));
+ccMuteButton.addEventListener("click", () => {
+    if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ control: "mute" }));
+});
+
+ccDisplayButton.addEventListener("click", () => {
+    spectrumActive = !spectrumActive;
+    ccSpectrum.hidden = !spectrumActive;
+    ccSignalLabel.textContent = spectrumActive ? "DISPLAY" : "VOLUME";
+    [ccVolumeValue, ccVolumeUnit, ccVolumeSegments, ccSignal.querySelector(".signal-details"), ccSignal.querySelector(".cc-caption")]
+        .forEach(element => element.hidden = spectrumActive);
+    ccDisplayButton.classList.toggle("active", spectrumActive);
+    ccDisplayButton.setAttribute("aria-pressed", String(spectrumActive));
+    ccDisplayButton.setAttribute("aria-label", spectrumActive ? "Show volume display" : "Show spectrum display");
+});
 
 progressTrack.addEventListener("click", event => {
     const durationSeconds = Number(duration.dataset.seconds || 0);
@@ -217,6 +328,26 @@ function animateMeters() {
     // animated output level as a visual stand-in for louder playback.
     const signal = Math.max(0, Math.min(1, ((Math.abs(leftLevel) + Math.abs(rightLevel)) / 2 + 45) / 85));
     if (pcAmps) pcAmps.textContent = (1.5 + signal * 6.5).toFixed(1);
+
+    if (spectrumActive) {
+        ccSpectrumBarValues.forEach((level, index, values) => {
+            const target = .18 + Math.max(0, Math.sin(Date.now() / 360 + index * .72)) * .42 + Math.random() * .28;
+            values[index] += (target - level) * .18;
+            const now = Date.now();
+            if (target >= ccSpectrumPeakValues[index]) {
+                ccSpectrumPeakValues[index] = target;
+                ccSpectrumPeakTimes[index] = now;
+            } else if (now - ccSpectrumPeakTimes[index] > 2000) {
+                ccSpectrumPeakValues[index] = Math.max(target, ccSpectrumPeakValues[index] * .992);
+            }
+            const levelPercent = Math.max(8, values[index] * 100);
+            const peakPercent = Math.max(levelPercent, ccSpectrumPeakValues[index] * 100);
+            ccSpectrumBarElements[index].style.height = `${levelPercent}%`;
+            const barHeight = ccSpectrumBars.clientHeight || 1;
+            const peakOffset = Math.max(0, (peakPercent - levelPercent) / 100 * barHeight * .35);
+            ccSpectrumBarElements[index].style.setProperty("--peak-offset", `${peakOffset}px`);
+        });
+    }
 
     leftNeedle.style.transform =
         `rotate(${leftLevel}deg)`;

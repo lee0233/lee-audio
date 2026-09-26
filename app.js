@@ -29,6 +29,7 @@ const wss = new WebSocketServer({ server });
 
 let currentTrack = null;
 let currentZone = null;
+let currentOutput = null;
 let roonTransport = null;
 let coreAudioProbe = null;
 
@@ -112,6 +113,29 @@ wss.on("connection", (socket) => {
             return;
         }
 
+        if (request.control === "volume") {
+            const value = Number(request.value);
+            if (currentOutput?.volume && Number.isFinite(value)) {
+                const volume = currentOutput.volume;
+                roonTransport.change_volume(
+                    currentOutput,
+                    "absolute",
+                    Math.max(volume.min, Math.min(volume.max, value)),
+                    error => { if (error) console.error(`Volume change failed: ${error}`); }
+                );
+            }
+            return;
+        }
+
+        if (request.control === "mute") {
+            if (currentOutput?.volume) {
+                roonTransport.mute(currentOutput, currentOutput.volume.is_muted ? "unmute" : "mute", error => {
+                    if (error) console.error(`Mute change failed: ${error}`);
+                });
+            }
+            return;
+        }
+
         const controls = new Set(["previous", "playpause", "next"]);
         if (!controls.has(request.control)) return;
         roonTransport.control(currentZone, request.control, error => {
@@ -187,6 +211,7 @@ core_unpaired: (core) => {
 function updateNowPlaying(zone) {
 
     currentZone = zone;
+    currentOutput = zone.outputs?.[0] || null;
 
     const nowPlaying = zone.now_playing;
 
@@ -203,25 +228,24 @@ function updateNowPlaying(zone) {
         return;
     }
 
+    const track = nowPlaying.three_line?.line1 || "Unknown";
+    const artist = nowPlaying.three_line?.line2 || "";
+    const album = nowPlaying.three_line?.line3 || "";
+    const sameTrack = currentTrack && currentTrack.track === track &&
+        currentTrack.artist === artist && currentTrack.album === album;
+    const fallbackFormat = (track.match(/\(([^)]+(?:kHz|Hz)[^)]*)\)/i)?.[1] || "FORMAT");
+
     currentTrack = {
         type: "now-playing",
         state: zone.state,
+        track,
+        artist,
+        album,
 
-        track:
-            nowPlaying.three_line?.line1 ||
-            "Unknown",
-
-        artist:
-            nowPlaying.three_line?.line2 ||
-            "",
-
-        album:
-            nowPlaying.three_line?.line3 ||
-            "",
-
-        format:
-            (nowPlaying.three_line?.line1 || "").match(/\(([^)]+(?:kHz|Hz)[^)]*)\)/i)?.[1] ||
-            "FORMAT",
+        // Preserve the CoreAudio-derived format across volume/state-only Roon events.
+        format: sameTrack && currentTrack.format && currentTrack.format !== "FORMAT"
+            ? currentTrack.format
+            : fallbackFormat,
 
         length:
             nowPlaying.length || 0,
@@ -230,7 +254,15 @@ function updateNowPlaying(zone) {
             nowPlaying.seek_position || 0,
 
         imageKey: 
-            nowPlaying.image_key || null
+            nowPlaying.image_key || null,
+
+        volume: currentOutput?.volume ? {
+            type: currentOutput.volume.type,
+            min: currentOutput.volume.min,
+            max: currentOutput.volume.max,
+            value: currentOutput.volume.value,
+            isMuted: currentOutput.volume.is_muted
+        } : null
     };
 
     console.log(

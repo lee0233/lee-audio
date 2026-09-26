@@ -119,23 +119,28 @@
         </div>
         <div class="cc-signal" aria-label="Volume and signal data not connected">
             <div class="cc-label">VOLUME</div>
-            <div class="volume-reading">— <span>dB</span></div>
-            <div class="volume-segments" aria-hidden="true"></div>
-            <div class="signal-details"><span>PCM — / —</span><span>STEREO</span></div>
+            <div class="volume-reading"><span id="cc-volume-value">—</span> <span id="cc-volume-unit">%</span></div>
+            <div id="cc-volume-segments" class="volume-segments" aria-hidden="true"></div>
+            <div class="signal-details"><span id="cc-format-readout">FORMAT</span><span id="cc-channel-readout">STEREO</span></div>
             <div class="cc-caption">CONTROL NOT CONNECTED</div>
+            <div id="cc-spectrum" class="cc-spectrum" hidden aria-label="Simulated spectrum analyzer">
+                <div class="spectrum-heading"><span>SPECTRO PEAK</span><span>VFD / 2CH</span></div>
+                <div id="cc-spectrum-bars" class="spectrum-bars" aria-hidden="true"></div>
+                <div class="spectrum-frequency" aria-hidden="true"><span>63</span><span>250</span><span>1k</span><span>4k</span><span>12.5k</span></div>
+            </div>
         </div>
         <div class="cc-volume">
             <div class="cc-label">VOLUME</div>
-            <button class="cc-knob" disabled aria-label="Volume control not yet connected"></button>
+            <button id="cc-volume-knob" class="cc-knob" aria-label="Volume control"></button>
         </div>
         <div class="cc-options">
             <div class="cc-label">BALANCE</div>
             <button class="balance-knob" disabled aria-label="Balance control not yet connected"></button>
             <div class="balance-labels"><span>L</span><span>R</span></div>
             <div class="aux-controls">
-                <div><button disabled aria-label="Mute not yet connected"></button><span>MUTE</span></div>
+                <div><button id="cc-mute-button" aria-label="Mute"></button><span>MUTE</span></div>
                 <div class="direct-active"><button disabled aria-label="Direct mode active"></button><span>DIRECT</span></div>
-                <div><button disabled aria-label="Display control not yet connected"></button><span>DISPLAY</span></div>
+                <div><button id="cc-display-button" aria-label="Show spectrum display"></button><span>DISPLAY</span></div>
             </div>
         </div>
         <div class="component-bottom">CC-1 REFERENCE CONTROL CENTER</div>
