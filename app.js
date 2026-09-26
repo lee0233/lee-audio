@@ -135,6 +135,9 @@ function updateNowPlaying(zone) {
         length:
             nowPlaying.length || 0,
 
+        seekPosition:
+            nowPlaying.seek_position || 0,
+
         imageKey: 
             nowPlaying.image_key || null
     };

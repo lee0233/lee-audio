@@ -2,6 +2,11 @@ const track = document.getElementById("track");
 const artist = document.getElementById("artist");
 const album = document.getElementById("album");
 const artwork = document.getElementById("artwork");
+const elapsed = document.getElementById("elapsed");
+const duration = document.getElementById("duration");
+const elapsedBottom = document.getElementById("elapsed-bottom");
+const durationBottom = document.getElementById("duration-bottom");
+const pcAmps = document.getElementById("pc-amps");
 
 const leftNeedle = document.getElementById("leftNeedle");
 const rightNeedle = document.getElementById("rightNeedle");
@@ -99,6 +104,19 @@ socket.addEventListener("message", event => {
     artist.textContent = data.artist;
     album.textContent = data.album;
 
+    const formatTime = seconds => {
+        if (!Number.isFinite(seconds) || seconds <= 0) return "--:--";
+        const minutes = Math.floor(seconds / 60);
+        const remainder = Math.floor(seconds % 60).toString().padStart(2, "0");
+        return `${minutes}:${remainder}`;
+    };
+    const elapsedText = formatTime(data.seekPosition);
+    const durationText = formatTime(data.length);
+    elapsed.textContent = elapsedText === "--:--" ? "0:00" : elapsedText;
+    duration.textContent = durationText;
+    elapsedBottom.textContent = elapsed.textContent;
+    durationBottom.textContent = durationText;
+
 if (data.imageKey) {
     artwork.src =
         `http://192.168.1.20:9330/api/image/${encodeURIComponent(data.imageKey)}?scale=fit&width=600&height=600`;
@@ -135,6 +153,11 @@ function animateMeters() {
 
     leftLevel += (leftTarget - leftLevel) * 0.22;
     rightLevel += (rightTarget - rightLevel) * 0.22;
+
+    // Until Roon exposes real power draw, make the PC-1 load follow the
+    // animated output level as a visual stand-in for louder playback.
+    const signal = Math.max(0, Math.min(1, ((Math.abs(leftLevel) + Math.abs(rightLevel)) / 2 + 45) / 85));
+    if (pcAmps) pcAmps.textContent = (1.5 + signal * 6.5).toFixed(1);
 
     leftNeedle.style.transform =
         `rotate(${leftLevel}deg)`;

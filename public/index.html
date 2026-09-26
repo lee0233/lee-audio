@@ -45,6 +45,8 @@
                         <span class="status-dot"></span>
                         PLAYING
                     </span>
+                    <span class="format-readout">FLAC 24/192</span>
+                    <span class="track-time"><span id="elapsed">0:00</span> / <span id="duration">--:--</span></span>
                 </div>
 
                 <div class="track-window">
@@ -60,8 +62,8 @@
                     </div>
 
                     <div class="time-row">
-                        <span>0:00</span>
-                        <span>--:--</span>
+                        <span id="elapsed-bottom">0:00</span>
+                        <span id="duration-bottom">--:--</span>
                     </div>
                 </div>
 
@@ -128,7 +130,7 @@
             <div class="balance-labels"><span>L</span><span>R</span></div>
             <div class="aux-controls">
                 <div><button disabled aria-label="Mute not yet connected"></button><span>MUTE</span></div>
-                <div><button disabled aria-label="Direct mode not yet connected"></button><span>DIRECT</span></div>
+                <div class="direct-active"><button disabled aria-label="Direct mode active"></button><span>DIRECT</span></div>
                 <div><button disabled aria-label="Display control not yet connected"></button><span>DISPLAY</span></div>
             </div>
         </div>
@@ -281,20 +283,21 @@
         </div>
         <div class="pc-display">
             <div class="pc-label">LINE VOLTAGE</div>
-            <div class="pc-reading">— — — <span>V</span></div>
-            <div class="pc-note">MONITOR NOT CONNECTED</div>
+            <div class="pc-reading"><span class="pc-digits">120</span> <span>V</span></div>
+            <div class="pc-current"><span class="pc-digits" id="pc-amps">8.0</span> <small>A</small></div>
+            <div class="pc-note">NOMINAL · SIMULATED LOAD</div>
         </div>
         <div class="pc-banks" aria-label="Outlet bank status unavailable">
             <div class="pc-label">OUTLET BANKS</div>
             <div class="pc-bank-row">
-                <div><span class="pc-indicator" aria-hidden="true"></span>DIGITAL</div>
-                <div><span class="pc-indicator" aria-hidden="true"></span>CONTROL</div>
+                <div><span class="pc-indicator active" aria-hidden="true"></span>DIGITAL</div>
+                <div><span class="pc-indicator active" aria-hidden="true"></span>CONTROL</div>
                 <div><span class="pc-indicator" aria-hidden="true"></span>POWER AMP</div>
             </div>
         </div>
         <div class="pc-status" aria-label="Protection and ground status unavailable">
-            <div><span class="pc-indicator" aria-hidden="true"></span>PROTECTION</div>
-            <div><span class="pc-indicator" aria-hidden="true"></span>GROUND</div>
+            <div><span class="pc-indicator active" aria-hidden="true"></span>PROTECTION</div>
+            <div><span class="pc-indicator active" aria-hidden="true"></span>GROUND</div>
             <div class="pc-note">STATUS UNAVAILABLE</div>
         </div>
         <div class="pc-standby">

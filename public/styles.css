@@ -14,9 +14,9 @@ body { background: radial-gradient(ellipse at 50% 25%, #24231e, #080a09 65%, #03
 .model-name,.model-description { color:#87c9f0; font-size:1.05cqw; letter-spacing:.12cqw; line-height:1.5; }
 .model-name { margin-top:.65cqw; }
 .dp-brand-area,.cc-brand,.amp-heading { position:relative; align-self:stretch; padding-top:.7cqw; }
-.power-control { position:absolute; bottom:0; left:1.4cqw; text-align:center; }
+.power-control { position:absolute; bottom:0; left:1.4cqw; width:max-content; text-align:center; }
 .power-led { width:.45cqw; height:.45cqw; border-radius:50%; margin:0 auto .9cqw; background:#27ef76; box-shadow:0 0 8px #27ef7660; }
-.power-button { width:2.4cqw; height:2.4cqw; border:.23cqw solid #10baff; border-radius:50%; background:radial-gradient(circle at 30% 25%,#586065,#080b0e 55%); box-shadow:0 0 10px #00baff50,inset 0 0 3px #000; }
+.power-button { width:2.4cqw; height:2.4cqw; margin-inline:auto; border:.23cqw solid #b9c3c6; border-radius:50%; background:radial-gradient(circle at 32% 24%,#e1e7e8 0%,#7e898d 18%,#293136 48%,#070a0c 72%); box-shadow:0 0 0 .16cqw #26343a,0 0 10px #00baff35,inset 0 1px 2px #fff8,inset 0 -2px 3px #000; }
 .tiny-label { margin-top:.65cqw; font-size:.75cqw; color:#b6bdbd; }
 .component-face { display:grid; grid-template-columns:14% 20% minmax(0,1fr) 18%; gap:2cqw; align-items:center; }
 .dp1 { padding-block:2.1cqw; }
@@ -24,6 +24,8 @@ body { background: radial-gradient(ellipse at 50% 25%, #24231e, #080a09 65%, #03
 #artwork { width:100%; height:100%; object-fit:cover; display:none; }
 .digital-display { min-width:0; padding:1.3cqw 1.5cqw; background:linear-gradient(120deg,#020607,#000); border:1px solid #273234; border-radius:3px; }
 .display-topline { display:flex; gap:1.4cqw; align-items:center; color:#1ad0ff; font-size:1cqw; }
+.format-readout { color:#9edcf1; letter-spacing:.06cqw; }
+.track-time { margin-left:auto; color:#1ad0ff; white-space:nowrap; }
 .playing-indicator { display:flex; gap:.6cqw; align-items:center; font-size:.7cqw; }
 .status-dot { width:.6cqw; height:.6cqw; border-radius:50%; background:#23ef72; box-shadow:0 0 10px #23ef7240; }
 .track-window { margin-top:1.2cqw; }
@@ -40,7 +42,7 @@ body { background: radial-gradient(ellipse at 50% 25%, #24231e, #080a09 65%, #03
 .format-primary { font-size:.9cqw; letter-spacing:.25cqw; }
 .format-secondary { margin-top:.4cqw; font-size:.55cqw; letter-spacing:.1cqw; }
 .transport-buttons { display:flex; align-items:center; justify-content:center; gap:1cqw; }
-.transport-buttons button { width:3.3cqw; height:3.3cqw; border-radius:50%; border:2px solid #78817f; color:#e4f3fa; font-size:1.1cqw; background:radial-gradient(circle at 35% 20%,#42474b,#07090b 60%); box-shadow:0 3px 7px #000; }
+.transport-buttons button { width:3.3cqw; height:3.3cqw; border-radius:50%; border:2px solid #aab5b8; color:#e4f3fa; font-size:1.1cqw; background:radial-gradient(circle at 32% 22%,#d6dfe1 0%,#69757a 15%,#222b30 45%,#050708 72%); box-shadow:0 0 0 .14cqw #273238,0 3px 7px #000,inset 0 1px 2px #fff8; }
 .transport-buttons .play-button { width:4.4cqw; height:4.4cqw; border-color:#03baff; box-shadow:0 0 0 3px #102b3a,0 0 12px #00baff50; }
 .transport-labels { display:flex; justify-content:space-around; margin-top:1cqw; font-size:.55cqw; letter-spacing:.1cqw; color:#7a959e; }
 .component-bottom { display:none; }
@@ -61,7 +63,9 @@ body { background: radial-gradient(ellipse at 50% 25%, #24231e, #080a09 65%, #03
 .cc-knob::after,.balance-knob::after { content:""; position:absolute; top:5%; left:49%; width:2%; height:28%; background:#d3e4ed; box-shadow:0 0 3px #fff8; }
 .balance-labels { display:flex; justify-content:space-between; margin:.3cqw 2cqw; font-size:.8cqw; }
 .aux-controls { display:flex; justify-content:space-around; margin-top:1cqw; }
-.aux-controls button { display:block; width:1.4cqw; height:1.4cqw; margin:0 auto .6cqw; border-radius:50%; border:2px solid #626c6e; background:radial-gradient(circle at 35% 25%,#818b8e,#050707 60%); }
+.aux-controls button { display:block; width:1.4cqw; height:1.4cqw; margin:0 auto .6cqw; border-radius:50%; border:2px solid #9ba7aa; background:radial-gradient(circle at 35% 25%,#cbd3d4,#697579 18%,#111719 62%); box-shadow:inset 0 1px 2px #fff6,0 2px 3px #000; }
+.aux-controls .direct-active button { border-color:#1abfff; background:radial-gradient(circle at 35% 25%,#d9faff,#36cfff 28%,#0579ad 65%,#032435); box-shadow:0 0 9px #00bfffaa,inset 0 1px 2px #fff; }
+.aux-controls .direct-active span { color:#32d2ff; text-shadow:0 0 7px #00bfff80; }
 .aux-controls span { font-size:.65cqw; color:#829197; }
 .pa1 { display:grid; grid-template-columns:14% minmax(0,1fr); column-gap:2cqw; row-gap:1cqw; padding-block:1.6cqw; }
 .amp-heading { grid-row:1 / 3; }
@@ -172,17 +176,21 @@ body { background: radial-gradient(ellipse at 50% 25%, #24231e, #080a09 65%, #03
 
 /* Quiet power-center base; unlit indicators do not imply measured protection. */
 .pc1 { display:grid; grid-template-columns:14% 23% 28% 17% 10%; gap:2cqw; align-items:center; padding-block:1.4cqw; }
-.pc-brand .lee-logo { font-size:1.4cqw; }
-.pc-brand .model-name { margin-top:.4cqw; font-size:.9cqw; }
-.pc-brand .model-description { font-size:.8cqw; }
+.pc-brand .lee-logo { font-size:1.65cqw; }
+.pc-brand .model-name { margin-top:.65cqw; font-size:1.05cqw; }
+.pc-brand .model-description { font-size:1.05cqw; }
 .pc-display { text-align:center; padding:.7cqw 1cqw; background:#010708; border:1px solid #213438; border-radius:3px; box-shadow:inset 0 1px 5px #000; }
 .pc-label { color:#90a8b4; font-size:.75cqw; letter-spacing:.15cqw; }
-.pc-reading { color:#27c3f4; font:2cqw "Courier New",monospace; margin:.4cqw 0; letter-spacing:.15cqw; text-shadow:0 0 8px #00bfff25; }
-.pc-reading span { font-size:1cqw; }
+.pc-reading { color:#27c3f4; font:1.55cqw "Courier New",monospace; margin:.25cqw 0; letter-spacing:.15cqw; text-shadow:0 0 8px #00bfff45; }
+.pc-digits { font-family:"Courier New",monospace; font-size:1em !important; font-weight:700; letter-spacing:.22cqw; color:#38cfff; text-shadow:0 0 4px #0abfff,0 0 14px #00aaff70; }
+.pc-current { color:#37d5ff; font:1.55cqw "Courier New",monospace; letter-spacing:.12cqw; text-shadow:0 0 8px #00bfff55; }
+.pc-current small { font-size:.72em; font-weight:700; color:#8cdff2; }
+.pc-reading > span:not(.pc-digits) { font-size:.72em; font-weight:700; color:#8cdff2; }
 .pc-note { font-size:.5cqw; letter-spacing:.08cqw; color:#74868d; }
 .pc-banks { text-align:center; }
 .pc-bank-row { display:flex; justify-content:space-around; margin-top:1cqw; font-size:.65cqw; letter-spacing:.04cqw; }
 .pc-indicator { display:inline-block; width:.45cqw; height:.45cqw; border:1px solid #3f565c; border-radius:50%; background:#182b31; box-shadow:inset 0 1px 2px #000; }
+.pc-indicator.active { background:#2af07b; border-color:#9affbe; box-shadow:0 0 7px #22ed78aa, inset 0 1px 1px #fff8; }
 .pc-bank-row .pc-indicator { display:block; margin:0 auto .65cqw; }
 .pc-status { font-size:.65cqw; letter-spacing:.06cqw; line-height:2; }
 .pc-status .pc-indicator { margin-right:.6cqw; }
