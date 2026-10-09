@@ -7,6 +7,8 @@ const duration = document.getElementById("duration");
 const elapsedBottom = document.getElementById("elapsed-bottom");
 const durationBottom = document.getElementById("duration-bottom");
 const pcAmps = document.getElementById("pc-amps");
+const pcVA = document.getElementById("pc-va");
+const pcWatts = document.getElementById("pc-watts");
 const progressFill = document.getElementById("progress-fill");
 const progressTrack = document.querySelector(".progress-track");
 const formatReadout = document.getElementById("format-readout");
@@ -33,6 +35,8 @@ ccSpectrumBarValues.forEach(() => {
 });
 const ccSpectrumBarElements = [...ccSpectrumBars.children];
 let spectrumActive = false;
+let latestMetrics = null;
+let metricsReceivedAt = 0;
 let currentVolume = { type: "number", min: 0, max: 100, value: 0, isMuted: false };
 let queuedVolume = null;
 let volumeSendTimer = null;
@@ -105,7 +109,7 @@ window.addEventListener("resize", () => {
 });
 
 /* Decorative power scale: 0 dB = 150 W; P = 150 * 10 ** (dB / 10).
- * Watt labels are rounded. Needle movement remains a simulation.
+ * Watt labels are decorative. Live needles indicate digital sample-peak dBFS.
  * Keep the original pivot; space the main 10 dB steps evenly.
  */
 const markings = [
@@ -122,6 +126,18 @@ const markings = [
     { db: 2, angle: 47.67 },
     { db: 3, angle: 54, watts: "300" }
 ];
+
+// Interpolate through the same marks used to draw the scale, including its
+// expanded 0 to +3 dB section. Silence rests at the left stop.
+function amplitudeToNeedleAngle(amplitude) {
+    const db = amplitude > 0 ? 20 * Math.log10(amplitude) : -Infinity;
+    if (db <= markings[0].db) return markings[0].angle;
+    for (let i = 1; i < markings.length; i++) {
+        const a = markings[i - 1], b = markings[i];
+        if (db <= b.db) return a.angle + (b.angle - a.angle) * (db - a.db) / (b.db - a.db);
+    }
+    return markings[markings.length - 1].angle;
+}
 
 function point(angle, radius) {
     const r = angle * Math.PI / 180;
@@ -188,6 +204,17 @@ socket.addEventListener("open", () => {
 socket.addEventListener("message", event => {
 
     const data = JSON.parse(event.data);
+
+    if (data.type === "audio-status") {
+        ccSpectrum.title = data.message;
+        if (data.state !== "live") { latestMetrics = null; metricsReceivedAt = 0; }
+        return;
+    }
+    if (data.type === "audio-metrics") {
+        latestMetrics = data;
+        metricsReceivedAt = performance.now();
+        return;
+    }
 
     if (data.type !== "now-playing") return;
 
@@ -282,8 +309,8 @@ ccMuteButton.addEventListener("click", () => {
 ccDisplayButton.addEventListener("click", () => {
     spectrumActive = !spectrumActive;
     ccSpectrum.hidden = !spectrumActive;
-    ccSignalLabel.textContent = spectrumActive ? "DISPLAY" : "VOLUME";
-    [ccVolumeValue, ccVolumeUnit, ccVolumeSegments, ccSignal.querySelector(".signal-details"), ccSignal.querySelector(".cc-caption")]
+    ccSignalLabel.textContent = spectrumActive ? "SPECTRUM" : "VOLUME";
+    [ccVolumeValue, ccVolumeUnit, ccVolumeSegments, ccSignal.querySelector(".signal-details")]
         .forEach(element => element.hidden = spectrumActive);
     ccDisplayButton.classList.toggle("active", spectrumActive);
     ccDisplayButton.setAttribute("aria-pressed", String(spectrumActive));
@@ -310,28 +337,45 @@ socket.addEventListener("close", () => {
 
 
 // -------------------------------------------------------
-// Temporary meter simulation
+// Audio metrics presentation
 // -------------------------------------------------------
 
 let leftLevel = -25;
 let rightLevel = -23;
 
 function animateMeters() {
+    const metrics = performance.now() - metricsReceivedAt < 1000 ? latestMetrics : null;
+    const leftPeak = metrics?.leftPeak ?? 0;
+    const rightPeak = metrics?.rightPeak ?? 0;
+    // Digital amplitude is logarithmic; this is not a measurement of amplifier watts.
+    const needleAngle = value => metrics?.source === "simulator"
+        ? -55 + value * 109 : amplitudeToNeedleAngle(value);
+    ccSpectrum.querySelector(".spectrum-heading span:last-child").textContent =
+        !metrics ? "NO AUDIO DATA" : metrics.source === "simulator" ? "SIMULATED" : "LIVE / 2CH";
+    leftLevel += (needleAngle(leftPeak) - leftLevel) * 0.22;
+    rightLevel += (needleAngle(rightPeak) - rightLevel) * 0.22;
 
-    const leftTarget = -45 + Math.random() * 85;
-    const rightTarget = -45 + Math.random() * 85;
-
-    leftLevel += (leftTarget - leftLevel) * 0.22;
-    rightLevel += (rightTarget - rightLevel) * 0.22;
-
-    // Until Roon exposes real power draw, make the PC-1 load follow the
-    // animated output level as a visual stand-in for louder playback.
-    const signal = Math.max(0, Math.min(1, ((Math.abs(leftLevel) + Math.abs(rightLevel)) / 2 + 45) / 85));
-    if (pcAmps) pcAmps.textContent = (1.5 + signal * 6.5).toFixed(1);
+    if (!metrics) {
+        if (pcAmps) pcAmps.textContent = "—";
+        if (pcVA) pcVA.textContent = "—";
+        if (pcWatts) pcWatts.textContent = "—";
+    } else {
+        // Follow the PA-1's live peak level. A squared RMS-to-line-current mapping
+        // made ordinary playback round down to zero, so treat this as a visual estimate.
+        const signalPeak = Math.max(0, Math.min(1, (leftPeak + rightPeak) / 2));
+        // Round current to the displayed precision first, then derive VA/W
+        // from that value so the readouts stay arithmetically coherent.
+        const estimatedAmps = Number((3.7 * signalPeak).toFixed(2));
+        const estimatedVA = 120 * estimatedAmps;
+        const estimatedWatts = estimatedVA * 0.70;
+        if (pcAmps) pcAmps.textContent = estimatedAmps.toFixed(2);
+        if (pcVA) pcVA.textContent = String(Math.round(estimatedVA));
+        if (pcWatts) pcWatts.textContent = String(Math.round(estimatedWatts));
+    }
 
     if (spectrumActive) {
         ccSpectrumBarValues.forEach((level, index, values) => {
-            const target = .18 + Math.max(0, Math.sin(Date.now() / 360 + index * .72)) * .42 + Math.random() * .28;
+            const target = metrics?.spectrumBands?.[index] ?? 0;
             values[index] += (target - level) * .18;
             const now = Date.now();
             if (target >= ccSpectrumPeakValues[index]) {
@@ -340,20 +384,17 @@ function animateMeters() {
             } else if (now - ccSpectrumPeakTimes[index] > 2000) {
                 ccSpectrumPeakValues[index] = Math.max(target, ccSpectrumPeakValues[index] * .992);
             }
-            const levelPercent = Math.max(8, values[index] * 100);
+            const levelPercent = Math.max(0, values[index] * 100);
             const peakPercent = Math.max(levelPercent, ccSpectrumPeakValues[index] * 100);
             ccSpectrumBarElements[index].style.height = `${levelPercent}%`;
             const barHeight = ccSpectrumBars.clientHeight || 1;
-            const peakOffset = Math.max(0, (peakPercent - levelPercent) / 100 * barHeight * .35);
+            const peakOffset = Math.max(0, (peakPercent - levelPercent) / 100 * barHeight * (metrics?.source === "simulator" ? .35 : 1));
             ccSpectrumBarElements[index].style.setProperty("--peak-offset", `${peakOffset}px`);
         });
     }
 
-    leftNeedle.style.transform =
-        `rotate(${leftLevel}deg)`;
-
-    rightNeedle.style.transform =
-        `rotate(${rightLevel}deg)`;
+    leftNeedle.style.transform = `rotate(${leftLevel}deg)`;
+    rightNeedle.style.transform = `rotate(${rightLevel}deg)`;
 }
 
-setInterval(animateMeters, 55);
+setInterval(animateMeters, 33);

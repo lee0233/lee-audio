@@ -6,6 +6,9 @@ const path = require("path");
 const fs = require("fs");
 const { execFile, execFileSync } = require("child_process");
 const { WebSocketServer } = require("ws");
+const { AudioMetricsHub, SimulatorProvider } = require("./lib/audio-metrics");
+
+const { CoreAudioProvider } = require("./lib/coreaudio-provider");
 
 const TARGET_ZONE = "Topping DX5";
 
@@ -26,6 +29,17 @@ const server = web.listen(8080, () => {
 // -------------------------------------------------------
 
 const wss = new WebSocketServer({ server });
+
+let captureStatus = { type: "audio-status", state: "connecting", message: "Starting audio provider" };
+const provider = process.env.LEE_AUDIO_PROVIDER === "simulator" ? new SimulatorProvider() : new CoreAudioProvider({
+    onStatus(status) {
+        captureStatus = { type: "audio-status", ...status };
+        console.log(`[audio] ${status.message}`);
+        broadcast(captureStatus);
+    }
+});
+const audioMetrics = new AudioMetricsHub(provider);
+audioMetrics.on("metrics", metrics => broadcast(metrics));
 
 let currentTrack = null;
 let currentZone = null;
@@ -94,6 +108,7 @@ function broadcast(data) {
 
 wss.on("connection", (socket) => {
     console.log("Display connected");
+    socket.send(JSON.stringify(captureStatus));
 
     if (currentTrack) {
         socket.send(JSON.stringify(currentTrack));
@@ -283,3 +298,9 @@ roon.start_discovery();
 startCoreAudioProbe();
 
 console.log("LEE AUDIO starting...");
+
+// Defer compilation until the server has initialized.
+setImmediate(() => audioMetrics.start());
+for (const signal of ["SIGINT", "SIGTERM"]) {
+    process.once(signal, () => { audioMetrics.stop(); server.close(); setTimeout(() => process.exit(0), 300); });
+}

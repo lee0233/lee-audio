@@ -122,10 +122,12 @@
             <div class="volume-reading"><span id="cc-volume-value">—</span> <span id="cc-volume-unit">%</span></div>
             <div id="cc-volume-segments" class="volume-segments" aria-hidden="true"></div>
             <div class="signal-details"><span id="cc-format-readout">FORMAT</span><span id="cc-channel-readout">STEREO</span></div>
-            <div class="cc-caption">CONTROL NOT CONNECTED</div>
             <div id="cc-spectrum" class="cc-spectrum" hidden aria-label="Simulated spectrum analyzer">
                 <div class="spectrum-heading"><span>SPECTRO PEAK</span><span>VFD / 2CH</span></div>
-                <div id="cc-spectrum-bars" class="spectrum-bars" aria-hidden="true"></div>
+                <div class="spectrum-plot">
+                    <div class="spectrum-db-scale" aria-hidden="true"><span>0</span><span>−20</span><span>−40</span><span>−60</span></div>
+                    <div id="cc-spectrum-bars" class="spectrum-bars" aria-hidden="true"></div>
+                </div>
                 <div class="spectrum-frequency" aria-hidden="true"><span>63</span><span>250</span><span>1k</span><span>4k</span><span>12.5k</span></div>
             </div>
         </div>
@@ -140,7 +142,7 @@
             <div class="aux-controls">
                 <div><button id="cc-mute-button" aria-label="Mute"></button><span>MUTE</span></div>
                 <div class="direct-active"><button disabled aria-label="Direct mode active"></button><span>DIRECT</span></div>
-                <div><button id="cc-display-button" aria-label="Show spectrum display"></button><span>DISPLAY</span></div>
+                <div><button id="cc-display-button" aria-label="Show spectrum display"></button><span>SPECTRUM</span></div>
             </div>
         </div>
         <div class="component-bottom">CC-1 REFERENCE CONTROL CENTER</div>
@@ -201,7 +203,7 @@
                     <text class="scale-unit" x="500" y="45">WATTS</text>
                     <text class="scale-unit" x="500" y="245">DECIBELS</text>
                     <text class="vu-label" x="500" y="325">POWER OUTPUT</text>
-                    <text class="meter-reference" x="500" y="355">0 dB = 150 W · SIMULATED</text>
+                    <text class="meter-reference" x="500" y="355">0 dB = 150 W · REFERENCE</text>
 
                     <text class="channel-label"
                           x="500" y="390">LEFT</text>
@@ -256,7 +258,7 @@
                     <text class="scale-unit" x="500" y="45">WATTS</text>
                     <text class="scale-unit" x="500" y="245">DECIBELS</text>
                     <text class="vu-label" x="500" y="325">POWER OUTPUT</text>
-                    <text class="meter-reference" x="500" y="355">0 dB = 150 W · SIMULATED</text>
+                    <text class="meter-reference" x="500" y="355">0 dB = 150 W · REFERENCE</text>
 
                     <text class="channel-label"
                           x="500" y="390">RIGHT</text>
@@ -291,23 +293,28 @@
             <div class="model-description">POWER CENTER</div>
         </div>
         <div class="pc-display">
-            <div class="pc-label">LINE VOLTAGE</div>
-            <div class="pc-reading"><span class="pc-digits">120</span> <span>V</span></div>
-            <div class="pc-current"><span class="pc-digits" id="pc-amps">8.0</span> <small>A</small></div>
-            <div class="pc-note">NOMINAL · SIMULATED LOAD</div>
+            <div class="pc-label">MC152 ESTIMATED LOAD</div>
+            <div class="pc-readout-row">
+                <div class="pc-reading"><span class="pc-digits">120</span><span class="pc-unit">V</span></div>
+                <div class="pc-power"><span class="pc-digits" id="pc-va">—</span><span class="pc-unit">VA</span></div>
+            </div>
+            <div class="pc-readout-row">
+                <div class="pc-power"><span class="pc-digits" id="pc-watts">—</span><span class="pc-unit">W</span></div>
+                <div class="pc-current"><span class="pc-digits" id="pc-amps">—</span><span class="pc-unit">A</span></div>
+            </div>
+            <div class="pc-note">SIGNAL ESTIMATE · PF 0.70</div>
         </div>
         <div class="pc-banks" aria-label="Outlet bank status unavailable">
             <div class="pc-label">OUTLET BANKS</div>
             <div class="pc-bank-row">
                 <div><span class="pc-indicator active" aria-hidden="true"></span>DIGITAL</div>
                 <div><span class="pc-indicator active" aria-hidden="true"></span>CONTROL</div>
-                <div><span class="pc-indicator" aria-hidden="true"></span>POWER AMP</div>
+                <div><span class="pc-indicator active" aria-hidden="true"></span>POWER AMP</div>
             </div>
         </div>
-        <div class="pc-status" aria-label="Protection and ground status unavailable">
+        <div class="pc-status" aria-label="Protection and ground indicators">
             <div><span class="pc-indicator active" aria-hidden="true"></span>PROTECTION</div>
             <div><span class="pc-indicator active" aria-hidden="true"></span>GROUND</div>
-            <div class="pc-note">STATUS UNAVAILABLE</div>
         </div>
         <div class="pc-standby">
             <button class="power-button" disabled aria-label="PC-1 standby control not connected"></button>

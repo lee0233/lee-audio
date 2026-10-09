@@ -68,11 +68,13 @@ body { background: radial-gradient(ellipse at 50% 25%, #24231e, #080a09 65%, #03
 .cc-spectrum[hidden] { display:none; }
 .cc-signal [hidden] { display:none !important; }
 .cc-spectrum { height:calc(100% - 2cqw); min-height:0; margin:0; padding:.1cqw 0 0; display:flex; flex-direction:column; justify-content:space-between; }
-.spectrum-heading { display:flex; justify-content:space-between; color:#83b9c7; font-size:.56cqw; letter-spacing:.12cqw; text-shadow:0 0 .35cqw #00bfff80; }
+.spectrum-heading { width:calc(100% - 2.05cqw); margin-left:2.05cqw; display:flex; justify-content:space-between; color:#83b9c7; font-size:.56cqw; letter-spacing:.12cqw; text-shadow:0 0 .35cqw #00bfff80; }
+.spectrum-plot { flex:1 1 auto; min-height:0; display:grid; grid-template-columns:1.7cqw minmax(0,1fr); gap:.35cqw; }
+.spectrum-db-scale { display:flex; flex-direction:column; justify-content:space-between; padding:.25cqw 0; color:#4e9caf; font-size:.46cqw; line-height:1; text-align:right; text-shadow:0 0 .25cqw #00bfff60; }
 .spectrum-bars { flex:1 1 auto; min-height:0; height:auto; display:flex; align-items:end; gap:.28cqw; padding:.35cqw .2cqw 0; border:1px solid #123846; border-bottom-color:#2c8ba1; background:repeating-linear-gradient(0deg,#061822 0,#061822 .28cqw,#092532 .28cqw,#092532 .36cqw); box-shadow:inset 0 0 .8cqw #001016,0 0 .45cqw #00bfff30; }
 .spectrum-bar { position:relative; flex:1; min-width:0; height:20%; border-radius:.08cqw .08cqw 0 0; background:repeating-linear-gradient(0deg,#0a5570 0,#0a5570 .18cqw,#55e9ff .18cqw,#55e9ff .27cqw); box-shadow:0 0 .45cqw #00bfff90; transform-origin:bottom; }
 .spectrum-bar::before { content:""; position:absolute; left:0; right:0; bottom:calc(100% + var(--peak-offset, 0px) + .12cqw); height:.22cqw; background:#ff304f; box-shadow:0 0 .35cqw #ff304f; opacity:1; z-index:2; }
-.spectrum-frequency { flex:0 0 auto; display:flex; justify-content:space-between; color:#4e9caf; font-size:.48cqw; letter-spacing:.04cqw; padding:.28cqw .1cqw 0; text-shadow:0 0 .25cqw #00bfff70; }
+.spectrum-frequency { flex:0 0 auto; margin-left:2.05cqw; display:flex; justify-content:space-between; color:#4e9caf; font-size:.48cqw; letter-spacing:.04cqw; padding:.28cqw .1cqw 0; text-shadow:0 0 .25cqw #00bfff70; }
 .aux-controls button.active { border-color:#1abfff; background:radial-gradient(circle at 35% 25%,#d9faff,#36cfff 28%,#0579ad 65%,#032435); box-shadow:0 0 9px #00bfffaa,inset 0 1px 2px #fff; }
 .aux-controls button[aria-pressed="true"] + span { color:#32d2ff; text-shadow:0 0 7px #00bfff80; }
 .cc-volume,.cc-options { text-align:center; }
@@ -192,7 +194,7 @@ body { background: radial-gradient(ellipse at 50% 25%, #24231e, #080a09 65%, #03
 .scale-unit { fill: #075174; font-size: 19px; letter-spacing: 3px; text-anchor: middle; }
 .vu-label { fill: #084465; font-size: 24px; letter-spacing: 5px; }
 .channel-label { fill: #073d59; font-size: 24px; letter-spacing: 8px; }
-.meter-reference { fill: #085171; font-size: 15px; letter-spacing: 1.5px; text-anchor: middle; }
+.meter-reference { fill: #085171; font-size: 15px; letter-spacing: 1.5px; text-anchor: middle; dominant-baseline: middle; }
 .needle line { stroke: #071c29; stroke-width: 3; }
 .meter-shell { position: relative; box-shadow: inset 0 2px 5px #000, 0 4px 10px #000; }
 .meter-shell::after { content: ""; position: absolute; inset: .5cqw; border-radius: 3px; pointer-events: none; background: linear-gradient(155deg, #ffffff18, transparent 35%, transparent 80%, #ffffff06); box-shadow: inset 0 2px 6px #002435aa; }
@@ -204,12 +206,13 @@ body { background: radial-gradient(ellipse at 50% 25%, #24231e, #080a09 65%, #03
 .pc-brand .model-description { font-size:1.05cqw; }
 .pc-display { text-align:center; padding:.7cqw 1cqw; background:#010708; border:1px solid #213438; border-radius:3px; box-shadow:inset 0 1px 5px #000; }
 .pc-label { color:#90a8b4; font-size:.75cqw; letter-spacing:.15cqw; }
-.pc-reading { color:#27c3f4; font:1.55cqw "SF Mono","Menlo","Courier New",monospace; font-weight:700; margin:.25cqw 0; letter-spacing:.15cqw; text-shadow:0 0 3px #0abfff,0 0 8px #00bfff,0 0 15px #00aaff70; }
-.pc-digits { font-family:"SF Mono","Menlo","Courier New",monospace; font-size:1em !important; font-weight:700; letter-spacing:.22cqw; color:#8beaff; text-shadow:0 0 3px #0abfff,0 0 8px #00bfff,0 0 15px #00aaff70; }
+.pc-readout-row { display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:.2cqw; }
+.pc-readout-row + .pc-readout-row { margin-top:.08cqw; }
+.pc-reading { display:grid; grid-template-columns:5ch 2ch; column-gap:.12cqw; justify-content:center; align-items:baseline; color:#27c3f4; font:1.45cqw "SF Mono","Menlo","Courier New",monospace; font-weight:700; margin:.08cqw 0; letter-spacing:.1cqw; text-shadow:0 0 3px #0abfff,0 0 8px #00bfff,0 0 15px #00aaff70; white-space:nowrap; }
+.pc-digits { display:block; width:5ch; box-sizing:border-box; text-align:right; font-family:"SF Mono","Menlo","Courier New",monospace; font-size:1em !important; font-weight:700; font-variant-numeric:tabular-nums; letter-spacing:.12cqw; color:#8beaff; text-shadow:0 0 3px #0abfff,0 0 8px #00bfff,0 0 15px #00aaff70; }
 .pc-digits { color:#38cfff; text-shadow:0 0 4px #0abfff,0 0 14px #00aaff70; }
-.pc-current { color:#37d5ff; font:1.55cqw "SF Mono","Menlo","Courier New",monospace; font-weight:700; letter-spacing:.12cqw; text-shadow:0 0 3px #0abfff,0 0 8px #00bfff,0 0 15px #00aaff70; }
-.pc-current small { font-size:.72em; font-weight:700; color:#8cdff2; text-shadow:0 0 5px #00bfff; }
-.pc-reading > span:not(.pc-digits) { font-size:.72em; font-weight:700; color:#8cdff2; text-shadow:0 0 5px #00bfff; }
+.pc-current,.pc-power { display:grid; grid-template-columns:5ch 2ch; column-gap:.12cqw; justify-content:center; align-items:baseline; color:#37d5ff; font:1.45cqw "SF Mono","Menlo","Courier New",monospace; font-weight:700; letter-spacing:.08cqw; text-shadow:0 0 3px #0abfff,0 0 8px #00bfff,0 0 15px #00aaff70; white-space:nowrap; }
+.pc-unit { font-size:.72em; font-weight:700; color:#8cdff2; text-align:left; text-shadow:0 0 5px #00bfff; }
 .pc-note { font-size:.5cqw; letter-spacing:.08cqw; color:#74868d; }
 .pc-banks { text-align:center; }
 .pc-bank-row { display:flex; justify-content:space-around; margin-top:1cqw; font-size:.65cqw; letter-spacing:.04cqw; }
