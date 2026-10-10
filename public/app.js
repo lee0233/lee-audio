@@ -325,6 +325,7 @@ ccVolumeKnob.addEventListener("pointermove", event => {
     if (ccVolumeKnob.hasPointerCapture(event.pointerId)) sendVolumeFromPointer(event);
 });
 ccVolumeKnob.addEventListener("pointerup", event => ccVolumeKnob.releasePointerCapture(event.pointerId));
+
 ccMuteButton.addEventListener("click", () => {
     if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ control: "mute" }));
 });
@@ -373,9 +374,9 @@ function approach(current, target, elapsedMs, riseMs, fallMs) {
     return current + (target - current) * (1 - Math.exp(-elapsedMs / timeConstant));
 }
 
-function peakToBarRatio(peak) {
-    if (!Number.isFinite(peak) || peak <= 0) return 0;
-    return Math.max(0, Math.min(1, (20 * Math.log10(peak) + 60) / 60));
+function amplitudeToBarRatio(amplitude) {
+    if (!Number.isFinite(amplitude) || amplitude <= 0) return 0;
+    return Math.max(0, Math.min(1, (20 * Math.log10(amplitude) + 60) / 60));
 }
 
 function animateMeters(nowMs) {
@@ -392,10 +393,11 @@ function animateMeters(nowMs) {
     leftLevel = approach(leftLevel, needleAngle(leftPeak), elapsedMs, 133, 133);
     rightLevel = approach(rightLevel, needleAngle(rightPeak), elapsedMs, 133, 133);
 
-    // The two compact bars show stereo sample peaks on the same -60..0 dBFS
-    // visual range as the analyzer. They remain visible in both CC-1 views.
-    [leftPeak, rightPeak].forEach((peak, index) => {
-        ccStereoLevels[index] = approach(ccStereoLevels[index], peakToBarRatio(peak), elapsedMs, 35, 110);
+    // Compact L/R bars follow each channel's RMS (average signal energy).
+    // Sample peaks made them read consistently hotter than a level display;
+    // PA-1 needles still show peaks, and the analyzer keeps its own bands.
+    [metrics?.leftRms ?? 0, metrics?.rightRms ?? 0].forEach((rms, index) => {
+        ccStereoLevels[index] = approach(ccStereoLevels[index], amplitudeToBarRatio(rms), elapsedMs, 35, 110);
         ccStereoFills[index].style.width = `${ccStereoLevels[index] * 100}%`;
     });
 
@@ -447,7 +449,11 @@ requestAnimationFrame(animateMeters);
 const listeningRoom = document.querySelector(".listening-room");
 const rack = listeningRoom.querySelector(".rack");
 const syncSpeakerHeight = () => {
-    listeningRoom.style.setProperty("--rack-height", `${rack.getBoundingClientRect().height}px`);
+    const { height, width } = rack.getBoundingClientRect();
+    listeningRoom.style.setProperty("--rack-height", `${height}px`);
+    // The source artwork includes a little dark floor below its metal feet.
+    // Extend the speaker art on wide layouts so the visible feet share PC-1's baseline.
+    listeningRoom.style.setProperty("--speaker-height", `${height + width * .011}px`);
 };
 syncSpeakerHeight();
 new ResizeObserver(syncSpeakerHeight).observe(rack);
