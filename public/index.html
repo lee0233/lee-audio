@@ -9,7 +9,14 @@
 
 <body>
 
-<main class="rack">
+<main class="listening-room">
+    <div class="speaker speaker--left" aria-hidden="true">
+        <img class="speaker-image speaker-image--open" src="speaker-front-open.png" alt="">
+        <img class="speaker-image speaker-image--covered" src="speaker-front-grille.png" alt="">
+        <span class="speaker-brand">LEE AUDIO</span>
+    </div>
+
+    <div class="rack">
 
     <!-- =====================================================
          DP-1 DIGITAL PLAYER
@@ -283,8 +290,8 @@
 
     </section>
 
-    <!-- PC-1 is a visual front panel until a power-monitor data source is connected. -->
-    <section class="component pc1" aria-label="PC-1 power center — monitoring not connected">
+    <!-- PC-1 estimates the whole rack's load until a power monitor is connected. -->
+    <section class="component pc1" aria-label="PC-1 power center — simulated load">
         <div class="side-rail left-rail" aria-hidden="true"></div>
         <div class="side-rail right-rail" aria-hidden="true"></div>
         <div class="pc-brand">
@@ -293,7 +300,7 @@
             <div class="model-description">POWER CENTER</div>
         </div>
         <div class="pc-display">
-            <div class="pc-label">MC152 ESTIMATED LOAD</div>
+            <div class="pc-label">SYSTEM ESTIMATED LOAD</div>
             <div class="pc-readout-row">
                 <div class="pc-reading"><span class="pc-digits">120</span><span class="pc-unit">V</span></div>
                 <div class="pc-power"><span class="pc-digits" id="pc-va">—</span><span class="pc-unit">VA</span></div>
@@ -302,7 +309,7 @@
                 <div class="pc-power"><span class="pc-digits" id="pc-watts">—</span><span class="pc-unit">W</span></div>
                 <div class="pc-current"><span class="pc-digits" id="pc-amps">—</span><span class="pc-unit">A</span></div>
             </div>
-            <div class="pc-note">SIGNAL ESTIMATE · PF 0.70</div>
+            <div class="pc-note">DP-1 + CC-1 + PA-1 · SIMULATED · PF <span id="pc-pf">—</span></div>
         </div>
         <div class="pc-banks" aria-label="Outlet bank status unavailable">
             <div class="pc-label">OUTLET BANKS</div>
@@ -322,8 +329,16 @@
         </div>
     </section>
 
+    </div>
+
+    <div class="speaker speaker--right" aria-hidden="true">
+        <img class="speaker-image speaker-image--open" src="speaker-front-open.png" alt="">
+        <img class="speaker-image speaker-image--covered" src="speaker-front-grille.png" alt="">
+        <span class="speaker-brand">LEE AUDIO</span>
+    </div>
 </main>
 
+<script src="power-model.js"></script>
 <script src="app.js"></script>
 
 </body>

@@ -35,14 +35,52 @@ window, with about 20 updates per second. Low-frequency resolution is limited
 at high sample rates; the native analysis can be refined independently of the UI.
 
 The browser applies needle smoothing and peak-marker presentation. PA-1 follows
-digital audio level: its existing watt scale is decorative, not measured amplifier
-power. PC-1 amps remain a simulated load, even when driven by live levels.
+digital audio peaks: its watt scale assumes a calibrated amplifier input and is
+not measured speaker power. PC-1 uses a separate, slower simulated mains-load
+model for the whole rack. Only the PA-1's variable load follows the two
+channels' RMS levels; the other active devices have provisional fixed loads.
+It still does not measure wall power.
+
+### PC-1 load simulation
+
+The audio-level calibration still uses a DX5 balanced-output proxy, an MC152
+balanced input, and B&W 702 S3 Signature speakers on the MC152's 4-ohm taps.
+Topping specifies
+4.2 Vrms at full scale; McIntosh specifies 2.4 Vrms balanced for 150 W per
+channel. B&W specifies a nominal 8-ohm speaker with a 3.1-ohm minimum. The
+MC152 is rated at 150 W per channel into its 2-, 4-, or 8-ohm taps, so the
+speaker's impedance dip does not directly multiply the rated output watts.
+
+The model converts digital RMS into an assumed amp input voltage and caps each
+channel at the MC152's rated output. PA-1 is assigned 95 W active idle use plus
+output power divided by 68% incremental efficiency. The other active-power
+budgets are 20 W for DP-1 (modeled on the HiFi Rose RS130), 30 W for CC-1
+(modeled on the McIntosh C53), and a provisional 15 W for PC-1 itself, giving
+160 W at silence. The passive B&W speakers have no separate wall draw;
+their demand is already represented in PA-1's output. Assumed power factors are
+0.72–0.90 for PA-1, 0.92 for DP-1, 0.90 for CC-1, and 0.95 for PC-1. PC-1
+smooths variable load changes with a 180 ms rise and 750 ms fall. The DP-1
+budget rounds an RS130 lab reading of 18 W, and the CC-1 budget follows the
+C53's published 30 W requirement. PA-1 idle use, PC-1 overhead, efficiency,
+and power factors are **simulation assumptions**, not measured values. The
+RS130 is a digital transport; its path through a C53 DAC and volume stage has
+not yet been calibrated, so the DX5 voltage proxy remains provisional. The
+display derives VA and W
+from its displayed 0.01 A and power-factor precision. 100% digital volume does
+not imply continuous rated amplifier output.
+
+Sources: [MC152 owner manual](https://www.mcintoshlabs.com/-/media/Files/mcintoshlabs/DocumentMaster/us/mc152om01.pdf),
+[DX5 owner manual](https://dl.topping.audio/usermanual/dx5_dx5l.pdf),
+[B&W 702 S3 Signature specifications](https://www.bowerswilkins.com/en-gb/product/loudspeakers/702-s3-signature/FP43575.html),
+[RS130 lab power measurement](https://www.hifinews.com/content/hifi-rose-rs130-music-librarystreamer-lab-report),
+[C53 owner manual](https://www.mcintoshlabs.com/-/media/Files/mcintoshlabs/DocumentMaster/us/c53om-01.pdf).
+
 The native helper reconnects after tap sample-rate/channel changes. A failed or
 missing device is retried every five seconds.
 
 ### Verification
 
-`node --test test/audio-metrics.test.js`
+`node --test test/*.test.js`
 
 After compilation: `.cache/audio-capture --self-test` checks a generated 1 kHz tone,
 stereo isolation, RMS calibration, and silence without needing capture permission.

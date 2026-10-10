@@ -9,6 +9,10 @@ const durationBottom = document.getElementById("duration-bottom");
 const pcAmps = document.getElementById("pc-amps");
 const pcVA = document.getElementById("pc-va");
 const pcWatts = document.getElementById("pc-watts");
+const pcPowerFactor = document.getElementById("pc-pf");
+// PC-1's simulated mains estimate is separate from the live VU/spectrum UI.
+// All electrical assumptions and rounding live in power-model.js.
+const pcLoadEstimator = new LeeAudioPowerModel.SystemLoadEstimator();
 const progressFill = document.getElementById("progress-fill");
 const progressTrack = document.querySelector(".progress-track");
 const formatReadout = document.getElementById("format-readout");
@@ -37,6 +41,7 @@ const ccSpectrumBarElements = [...ccSpectrumBars.children];
 let spectrumActive = false;
 let latestMetrics = null;
 let metricsReceivedAt = 0;
+let latestPowerLoad = null;
 let currentVolume = { type: "number", min: 0, max: 100, value: 0, isMuted: false };
 let queuedVolume = null;
 let volumeSendTimer = null;
@@ -207,12 +212,22 @@ socket.addEventListener("message", event => {
 
     if (data.type === "audio-status") {
         ccSpectrum.title = data.message;
-        if (data.state !== "live") { latestMetrics = null; metricsReceivedAt = 0; }
+        if (data.state !== "live") {
+            // A disconnected/stopped audio feed must not leave an old load
+            // reading on screen or carry its smoothing history into playback.
+            latestMetrics = null;
+            metricsReceivedAt = 0;
+            latestPowerLoad = null;
+            pcLoadEstimator.reset();
+        }
         return;
     }
     if (data.type === "audio-metrics") {
+        // One stereo RMS sample updates the whole-rack estimate. Peaks still
+        // drive the needle presentation, but are not treated as wall watts.
         latestMetrics = data;
         metricsReceivedAt = performance.now();
+        latestPowerLoad = pcLoadEstimator.update(data, metricsReceivedAt);
         return;
     }
 
@@ -356,21 +371,18 @@ function animateMeters() {
     rightLevel += (needleAngle(rightPeak) - rightLevel) * 0.22;
 
     if (!metrics) {
+        // No recent audio data means the estimate is unknown, not zero watts.
         if (pcAmps) pcAmps.textContent = "—";
         if (pcVA) pcVA.textContent = "—";
         if (pcWatts) pcWatts.textContent = "—";
+        if (pcPowerFactor) pcPowerFactor.textContent = "—";
     } else {
-        // Follow the PA-1's live peak level. A squared RMS-to-line-current mapping
-        // made ordinary playback round down to zero, so treat this as a visual estimate.
-        const signalPeak = Math.max(0, Math.min(1, (leftPeak + rightPeak) / 2));
-        // Round current to the displayed precision first, then derive VA/W
-        // from that value so the readouts stay arithmetically coherent.
-        const estimatedAmps = Number((3.7 * signalPeak).toFixed(2));
-        const estimatedVA = 120 * estimatedAmps;
-        const estimatedWatts = estimatedVA * 0.70;
-        if (pcAmps) pcAmps.textContent = estimatedAmps.toFixed(2);
-        if (pcVA) pcVA.textContent = String(Math.round(estimatedVA));
-        if (pcWatts) pcWatts.textContent = String(Math.round(estimatedWatts));
+        // The estimator already rounded these to PC-1's displayed precision;
+        // keep its values together so V*A ~= VA and VA*PF ~= W on the panel.
+        if (pcAmps) pcAmps.textContent = latestPowerLoad.amps.toFixed(2);
+        if (pcVA) pcVA.textContent = String(latestPowerLoad.va);
+        if (pcWatts) pcWatts.textContent = String(latestPowerLoad.watts);
+        if (pcPowerFactor) pcPowerFactor.textContent = latestPowerLoad.powerFactor.toFixed(2);
     }
 
     if (spectrumActive) {
@@ -398,3 +410,20 @@ function animateMeters() {
 }
 
 setInterval(animateMeters, 33);
+
+// Keep the floorstanders as tall as the full component stack.
+const listeningRoom = document.querySelector(".listening-room");
+const rack = listeningRoom.querySelector(".rack");
+const syncSpeakerHeight = () => {
+    listeningRoom.style.setProperty("--rack-height", `${rack.getBoundingClientRect().height}px`);
+};
+syncSpeakerHeight();
+new ResizeObserver(syncSpeakerHeight).observe(rack);
+
+// A discreet display shortcut: C fits or removes both speaker grilles.
+window.addEventListener("keydown", event => {
+    if (event.key.toLowerCase() !== "c" || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
+    if (event.target instanceof HTMLElement &&
+        (event.target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName))) return;
+    listeningRoom.classList.toggle("speaker-covers-on");
+});
