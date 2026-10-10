@@ -20,6 +20,7 @@ const ccFormatReadout = document.getElementById("cc-format-readout");
 const ccChannelReadout = document.getElementById("cc-channel-readout");
 const ccVolumeValue = document.getElementById("cc-volume-value");
 const ccVolumeUnit = document.getElementById("cc-volume-unit");
+const ccVolumeReading = document.querySelector(".volume-reading");
 const ccVolumeSegments = document.getElementById("cc-volume-segments");
 const ccVolumeKnob = document.getElementById("cc-volume-knob");
 const ccMuteButton = document.getElementById("cc-mute-button");
@@ -27,9 +28,13 @@ const ccDisplayButton = document.getElementById("cc-display-button");
 const ccSignal = document.querySelector(".cc-signal");
 const ccSignalLabel = ccSignal.querySelector(".cc-label");
 const ccSpectrum = document.getElementById("cc-spectrum");
+const ccSpectrumVolume = document.getElementById("cc-spectrum-volume");
+const ccSpectrumStatus = document.getElementById("cc-spectrum-status");
 const ccSpectrumBars = document.getElementById("cc-spectrum-bars");
-const ccSpectrumBarValues = Array.from({ length: 24 }, (_, index) => 0.2 + (index % 5) * 0.04);
-const ccSpectrumPeakValues = Array.from({ length: 24 }, () => 0.2);
+const ccStereoFills = [document.getElementById("cc-level-left"), document.getElementById("cc-level-right")];
+const ccStereoLevels = [0, 0];
+const ccSpectrumBarValues = Array.from({ length: 24 }, () => 0);
+const ccSpectrumPeakValues = Array.from({ length: 24 }, () => 0);
 const ccSpectrumPeakTimes = Array.from({ length: 24 }, () => 0);
 
 ccSpectrumBarValues.forEach(() => {
@@ -66,10 +71,13 @@ function renderVolume(volume) {
     const ratio = currentVolume.max > currentVolume.min
         ? Math.max(0, Math.min(1, (currentVolume.value - currentVolume.min) / (currentVolume.max - currentVolume.min)))
         : 0;
-    ccVolumeValue.textContent = Number.isFinite(currentVolume.value)
+    const valueText = Number.isFinite(currentVolume.value)
         ? currentVolume.value.toFixed(unit === "dB" ? 1 : 0)
         : "—";
+    ccVolumeValue.textContent = valueText;
     ccVolumeUnit.textContent = unit;
+    ccSpectrumVolume.textContent = valueText === "—" ? valueText : `${valueText}${unit}`;
+    ccSpectrumVolume.classList.toggle("muted", currentVolume.isMuted);
     ccVolumeSegments.style.setProperty("--volume-level", `${ratio * 100}%`);
     ccVolumeKnob.style.setProperty("--knob-angle", `${-135 + ratio * 270}deg`);
     ccVolumeKnob.dataset.min = currentVolume.min;
@@ -325,7 +333,7 @@ ccDisplayButton.addEventListener("click", () => {
     spectrumActive = !spectrumActive;
     ccSpectrum.hidden = !spectrumActive;
     ccSignalLabel.textContent = spectrumActive ? "SPECTRUM" : "VOLUME";
-    [ccVolumeValue, ccVolumeUnit, ccVolumeSegments, ccSignal.querySelector(".signal-details")]
+    [ccVolumeReading, ccVolumeSegments, ccSignal.querySelector(".signal-details")]
         .forEach(element => element.hidden = spectrumActive);
     ccDisplayButton.classList.toggle("active", spectrumActive);
     ccDisplayButton.setAttribute("aria-pressed", String(spectrumActive));
@@ -357,18 +365,39 @@ socket.addEventListener("close", () => {
 
 let leftLevel = -25;
 let rightLevel = -23;
+let lastMeterFrameAt = 0;
 
-function animateMeters() {
-    const metrics = performance.now() - metricsReceivedAt < 1000 ? latestMetrics : null;
+// Time-based motion keeps the meters equally responsive on 60/120 Hz screens.
+function approach(current, target, elapsedMs, riseMs, fallMs) {
+    const timeConstant = target > current ? riseMs : fallMs;
+    return current + (target - current) * (1 - Math.exp(-elapsedMs / timeConstant));
+}
+
+function peakToBarRatio(peak) {
+    if (!Number.isFinite(peak) || peak <= 0) return 0;
+    return Math.max(0, Math.min(1, (20 * Math.log10(peak) + 60) / 60));
+}
+
+function animateMeters(nowMs) {
+    const elapsedMs = lastMeterFrameAt ? Math.min(100, nowMs - lastMeterFrameAt) : 16.7;
+    lastMeterFrameAt = nowMs;
+    const metrics = nowMs - metricsReceivedAt < 1000 ? latestMetrics : null;
     const leftPeak = metrics?.leftPeak ?? 0;
     const rightPeak = metrics?.rightPeak ?? 0;
     // Digital amplitude is logarithmic; this is not a measurement of amplifier watts.
     const needleAngle = value => metrics?.source === "simulator"
         ? -55 + value * 109 : amplitudeToNeedleAngle(value);
-    ccSpectrum.querySelector(".spectrum-heading span:last-child").textContent =
+    ccSpectrumStatus.textContent =
         !metrics ? "NO AUDIO DATA" : metrics.source === "simulator" ? "SIMULATED" : "LIVE / 2CH";
-    leftLevel += (needleAngle(leftPeak) - leftLevel) * 0.22;
-    rightLevel += (needleAngle(rightPeak) - rightLevel) * 0.22;
+    leftLevel = approach(leftLevel, needleAngle(leftPeak), elapsedMs, 133, 133);
+    rightLevel = approach(rightLevel, needleAngle(rightPeak), elapsedMs, 133, 133);
+
+    // The two compact bars show stereo sample peaks on the same -60..0 dBFS
+    // visual range as the analyzer. They remain visible in both CC-1 views.
+    [leftPeak, rightPeak].forEach((peak, index) => {
+        ccStereoLevels[index] = approach(ccStereoLevels[index], peakToBarRatio(peak), elapsedMs, 35, 110);
+        ccStereoFills[index].style.width = `${ccStereoLevels[index] * 100}%`;
+    });
 
     if (!metrics) {
         // No recent audio data means the estimate is unknown, not zero watts.
@@ -386,30 +415,33 @@ function animateMeters() {
     }
 
     if (spectrumActive) {
+        const barHeight = ccSpectrumBars.clientHeight || 1;
         ccSpectrumBarValues.forEach((level, index, values) => {
             const target = metrics?.spectrumBands?.[index] ?? 0;
-            values[index] += (target - level) * .18;
-            const now = Date.now();
+            // React quickly to incoming ~30 Hz analysis frames; ease the fall
+            // just enough to remain readable without hiding musical attacks.
+            values[index] = approach(level, target, elapsedMs, 35, 105);
             if (target >= ccSpectrumPeakValues[index]) {
                 ccSpectrumPeakValues[index] = target;
-                ccSpectrumPeakTimes[index] = now;
-            } else if (now - ccSpectrumPeakTimes[index] > 2000) {
-                ccSpectrumPeakValues[index] = Math.max(target, ccSpectrumPeakValues[index] * .992);
+                ccSpectrumPeakTimes[index] = nowMs;
+            } else if (nowMs - ccSpectrumPeakTimes[index] > 150) {
+                ccSpectrumPeakValues[index] = approach(ccSpectrumPeakValues[index], target, elapsedMs, 180, 180);
             }
             const levelPercent = Math.max(0, values[index] * 100);
             const peakPercent = Math.max(levelPercent, ccSpectrumPeakValues[index] * 100);
             ccSpectrumBarElements[index].style.height = `${levelPercent}%`;
-            const barHeight = ccSpectrumBars.clientHeight || 1;
             const peakOffset = Math.max(0, (peakPercent - levelPercent) / 100 * barHeight * (metrics?.source === "simulator" ? .35 : 1));
             ccSpectrumBarElements[index].style.setProperty("--peak-offset", `${peakOffset}px`);
+            ccSpectrumBarElements[index].style.setProperty("--peak-visible", peakPercent > 1 ? "1" : "0");
         });
     }
 
     leftNeedle.style.transform = `rotate(${leftLevel}deg)`;
     rightNeedle.style.transform = `rotate(${rightLevel}deg)`;
+    requestAnimationFrame(animateMeters);
 }
 
-setInterval(animateMeters, 33);
+requestAnimationFrame(animateMeters);
 
 // Keep the floorstanders as tall as the full component stack.
 const listeningRoom = document.querySelector(".listening-room");

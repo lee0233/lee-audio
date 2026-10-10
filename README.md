@@ -31,10 +31,13 @@ bands, sample rate, channels, timestamp in epoch milliseconds, and source.
 Spectrum centers run logarithmically from 63 Hz to 12.5 kHz; band values map
 −60 to 0 dBFS onto 0–1. Stereo FFT powers are averaged before band selection
 so out-of-phase stereo content does not cancel. Analysis uses a 4096-sample Hann
-window, with about 20 updates per second. Low-frequency resolution is limited
+window, targeting 30 updates per second. Low-frequency resolution is limited
 at high sample rates; the native analysis can be refined independently of the UI.
 
-The browser applies needle smoothing and peak-marker presentation. PA-1 follows
+The browser draws at the display refresh rate and gives the spectrum a quick
+rise and short peak hold. CC-1 shows live stereo peak strips in both display
+views and the same Roon volume value on its volume and spectrum screens. The
+simulator emits at roughly 30 updates per second as well. PA-1 follows
 digital audio peaks: its watt scale assumes a calibrated amplifier input and is
 not measured speaker power. PC-1 uses a separate, slower simulated mains-load
 model for the whole rack. Only the PA-1's variable load follows the two

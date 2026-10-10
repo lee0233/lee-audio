@@ -124,18 +124,22 @@
             <div class="source-panel"><div class="source-active">● &nbsp; ROON</div>
             <span>QOBUZ</span><span>LOCAL</span><span>AUX 1</span><span>AUX 2</span></div>
         </div>
-        <div class="cc-signal" aria-label="Volume and signal data not connected">
+        <div class="cc-signal" aria-label="Volume and live stereo signal">
             <div class="cc-label">VOLUME</div>
             <div class="volume-reading"><span id="cc-volume-value">—</span> <span id="cc-volume-unit">%</span></div>
             <div id="cc-volume-segments" class="volume-segments" aria-hidden="true"></div>
             <div class="signal-details"><span id="cc-format-readout">FORMAT</span><span id="cc-channel-readout">STEREO</span></div>
-            <div id="cc-spectrum" class="cc-spectrum" hidden aria-label="Simulated spectrum analyzer">
-                <div class="spectrum-heading"><span>SPECTRO PEAK</span><span>VFD / 2CH</span></div>
+            <div id="cc-spectrum" class="cc-spectrum" hidden aria-label="Spectrum analyzer">
+                <div class="spectrum-heading"><span>SPECTRO PEAK</span><span id="cc-spectrum-volume" class="spectrum-volume">—</span><span id="cc-spectrum-status">NO AUDIO DATA</span></div>
                 <div class="spectrum-plot">
                     <div class="spectrum-db-scale" aria-hidden="true"><span>0</span><span>−20</span><span>−40</span><span>−60</span></div>
                     <div id="cc-spectrum-bars" class="spectrum-bars" aria-hidden="true"></div>
                 </div>
                 <div class="spectrum-frequency" aria-hidden="true"><span>63</span><span>250</span><span>1k</span><span>4k</span><span>12.5k</span></div>
+            </div>
+            <div class="cc-stereo-levels" aria-hidden="true">
+                <div class="cc-stereo-level"><span>L</span><div class="cc-stereo-track"><div id="cc-level-left" class="cc-stereo-fill"></div></div></div>
+                <div class="cc-stereo-level"><span>R</span><div class="cc-stereo-track"><div id="cc-level-right" class="cc-stereo-fill"></div></div></div>
             </div>
         </div>
         <div class="cc-volume">

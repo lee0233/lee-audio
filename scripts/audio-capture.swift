@@ -33,6 +33,7 @@ final class Analyzer {
     var left: [Float] = [], right: [Float] = []
     var window: [Float]
     var framesSinceEmission = 0
+    var hasEmitted = false
     init(rate: Double) {
         self.rate = rate
         setup = vDSP_DFT_zop_CreateSetup(nil, 4096, .FORWARD)!
@@ -54,8 +55,13 @@ final class Analyzer {
         }
         framesSinceEmission += frames
         if left.count > n { left.removeFirst(left.count - n); right.removeFirst(right.count - n) }
-        guard left.count == n, framesSinceEmission >= Int(rate / 30) else { return }
-        framesSinceEmission = 0
+        let emissionInterval = max(1, Int(rate / 30))
+        guard left.count == n, framesSinceEmission >= emissionInterval else { return }
+        // The first full FFT window is a warm-up. After that, carry surplus
+        // samples into the next interval: resetting to zero on every IO block
+        // can turn a nominal 30 Hz stream into ~20-25 Hz at common block sizes.
+        if hasEmitted { framesSinceEmission -= emissionInterval }
+        else { framesSinceEmission = 0; hasEmitted = true }
         emit()
     }
     func measurements() -> [String: Any] {
