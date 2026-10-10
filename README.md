@@ -35,7 +35,7 @@ window, targeting 30 updates per second. Low-frequency resolution is limited
 at high sample rates; the native analysis can be refined independently of the UI.
 
 The browser draws at the display refresh rate and gives the spectrum a quick
-rise and short peak hold. CC-1 shows live stereo peak strips in both display
+rise and short peak hold. CC-1 shows live stereo RMS strips in both display
 views and the same Roon volume value on its volume and spectrum screens. The
 simulator emits at roughly 30 updates per second as well. PA-1 follows
 digital audio peaks: its watt scale assumes a calibrated amplifier input and is
@@ -80,6 +80,9 @@ Sources: [MC152 owner manual](https://www.mcintoshlabs.com/-/media/Files/mcintos
 
 The native helper reconnects after tap sample-rate/channel changes. A failed or
 missing device is retried every five seconds.
+
+The CC-1 balance knob is a visual placeholder until a supported control path is
+available. It does not request USB access or alter the DX5 II.
 
 ### Verification
 
