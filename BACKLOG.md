@@ -38,6 +38,11 @@
 - [ ] **P2.4 — Connect container to Roon Server using existing Roon integration.** Validate LAN discovery/networking across Docker and any extension authorization required in Roon; avoid assuming container-to-container visibility or discovery without testing. **Done when:** zones, artwork, track state, volume (where supported), and playback controls behave as before.
 - [ ] **P2.5 — Browser and display validation.** Check TRITON, MIMAS and optional tablet/browser resolutions; retain current McIntosh-inspired views, genuine meters, spectrum and explicit simulated PC-1 power model. **Done when:** functional parity with current desktop visualizer is demonstrated.
 
+## Security finding — prioritized for remediation
+
+- [ ] **P1.4 — Remove sensitive Roon pairing state from the tracked repository.** Current `config.json` includes pairing token material. Do not copy its contents into issues or documentation. Stop tracking/generated state via `.gitignore`; decide whether pairing credentials need revocation and whether history cleanup is warranted based on repository exposure. Test re-pairing after safe remediation. **Done when:** no live pairing token is tracked in the current tree and history/exposure have been assessed.
+- [ ] **P2.6 — Secure Audio Monitor browser control surface.** Current WebSocket accepts transport/volume requests from connected clients; implement appropriate access controls/LAN boundaries before hosting on a NAS with wider reach. **Done when:** unauthorized clients cannot issue playback controls.
+
 ## P3 — Operational hardening and acceptance
 
 - [ ] **P3.1 — Reliability and deployment:** restart policy (`unless-stopped` where appropriate), health checks, dependency/retry handling, LAN security, logs with rotation, configuration backup and recovery documentation. **Done when:** NAS and Mac reboots recover services without manual repair.
