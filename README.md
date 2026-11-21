@@ -1,4 +1,11 @@
 # lee-audio
+
+## Project documentation
+
+- [Architecture and current data flows](docs/ARCHITECTURE.md)
+- [Operations, diagnostics and recovery](docs/OPERATIONS.md)
+- [Prioritized backlog and acceptance criteria](BACKLOG.md)
+
 Roon Audio Visualization Engine
 
 
